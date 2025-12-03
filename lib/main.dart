@@ -1,3 +1,4 @@
+import 'package:chat_app/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -15,9 +16,11 @@ class MyApp extends StatelessWidget {
 
       theme: ThemeData(
         fontFamily: 'SpaceGrotesk',
-        colorScheme: ColorScheme.fromSeed(seedColor: Color(0x2E4458FF)),
+        colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF2E4458)),
       ),
-      home: Scaffold(),
+      home: Scaffold(
+        body: Center(child: PrimaryButton(text: 'sample Text')),
+      ),
     );
   }
 }
