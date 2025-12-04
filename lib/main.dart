@@ -1,4 +1,4 @@
-import 'package:chat_app/widgets/primary_button.dart';
+import 'package:chat_app/screens/onboarding_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -16,11 +16,13 @@ class MyApp extends StatelessWidget {
 
       theme: ThemeData(
         fontFamily: 'SpaceGrotesk',
-        colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF2E4458)),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Color.fromRGBO(5, 115, 243, 1),
+        ),
+        primaryColor: Colors.blue,
+        scaffoldBackgroundColor: Color(0xFFE2EDF5),
       ),
-      home: Scaffold(
-        body: Center(child: PrimaryButton(text: 'sample Text')),
-      ),
+      home: Scaffold(body: Center(child: OnboardingScreen())),
     );
   }
 }
