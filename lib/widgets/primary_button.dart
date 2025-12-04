@@ -1,3 +1,4 @@
+import 'package:chat_app/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class PrimaryButton extends StatefulWidget {
@@ -20,10 +21,12 @@ class _PrimaryButtonState extends State<PrimaryButton> {
       child: TextButton(
         onPressed: () {},
         style: ButtonStyle(
-          backgroundColor: WidgetStateProperty.all(
-            Theme.of(context).colorScheme.primary,
+          backgroundColor: WidgetStateProperty.all(AppColors.primaryColor),
+          shape: WidgetStateProperty.all(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadiusGeometry.circular(6),
+            ),
           ),
-          shape: WidgetStateProperty.all(LinearBorder.none),
         ),
         child: Text(buttonTitle, style: TextStyle(color: Colors.white)),
       ),
