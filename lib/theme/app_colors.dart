@@ -9,4 +9,5 @@ class AppColors {
   static const inputBoxColor = Color(0xFFF6FBFF);
   static const dangerColor = Color(0xFFE24444);
   static const primaryLightColor = Color(0xFFD5E4FB);
+  static const backgroundColor = Color(0xFFE2EDF5);
 }
