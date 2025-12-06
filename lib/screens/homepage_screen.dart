@@ -1,5 +1,6 @@
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/widgets/app_text.dart';
+import 'package:chat_app/widgets/homescreen/homepage_navigation_bar.dart';
 import 'package:flutter/material.dart';
 
 class HomepageScreen extends StatelessWidget {
@@ -31,6 +32,7 @@ class HomepageScreen extends StatelessWidget {
             fontWeight: FontWeight.w600,
           ),
         ),
+
         actions: [
           Padding(
             padding: EdgeInsetsGeometry.symmetric(horizontal: 32),
@@ -43,6 +45,12 @@ class HomepageScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+      body: Padding(
+        padding: EdgeInsetsGeometry.symmetric(horizontal: 32),
+        child: Column(
+          children: [const SizedBox(height: 20), HomepageNavigationBar()],
+        ),
       ),
     );
   }
