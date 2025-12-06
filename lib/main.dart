@@ -1,6 +1,7 @@
 import 'package:chat_app/screens/onboarding_screen.dart';
 import 'package:chat_app/screens/register_screen.dart';
 import 'package:chat_app/screens/verify_screen.dart';
+import 'package:chat_app/screens/verify_success.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget {
         primaryColor: Colors.blue,
         scaffoldBackgroundColor: Color(0xFFE2EDF5),
       ),
-      home: Scaffold(body: VerifyScreen()),
+      home: Scaffold(body: VerifySuccess()),
     );
   }
 }
