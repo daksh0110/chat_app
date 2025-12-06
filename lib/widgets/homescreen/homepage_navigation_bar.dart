@@ -17,6 +17,7 @@ class _homepageNavigationBarState extends State<HomepageNavigationBar> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      padding: EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: AppColors.navigationbarColor,
         borderRadius: BorderRadius.circular(100),

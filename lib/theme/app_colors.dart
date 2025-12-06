@@ -11,4 +11,5 @@ class AppColors {
   static const primaryLightColor = Color(0xFFD5E4FB);
   static const backgroundColor = Color(0xFFE2EDF5);
   static const navigationbarColor = Color(0xFFDBE2EC);
+  static const secondaryLightColor = Color(0xFF728197);
 }
