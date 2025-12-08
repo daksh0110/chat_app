@@ -29,6 +29,8 @@ class RegisterScreen extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Scrollbar(
+                      thumbVisibility: false,
+                      trackVisibility: false,
                       child: SingleChildScrollView(
                         padding: const EdgeInsets.only(bottom: 24),
                         child: Column(
