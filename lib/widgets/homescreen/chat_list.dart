@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:chat_app/screens/import_address_screem.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/widgets/app_text.dart';
 import 'package:chat_app/widgets/popUp_modal.dart';
@@ -49,6 +50,13 @@ class _ChatListState extends State<ChatList> {
             const AppText("or", color: AppColors.placeholderTextColor),
             const SizedBox(height: 10),
             GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (context) => const ImportAddressScreem(),
+                  ),
+                );
+              },
               child: AppText(
                 "import an address",
                 color: AppColors.primaryColor,
