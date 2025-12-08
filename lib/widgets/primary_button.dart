@@ -18,10 +18,12 @@ class _PrimaryButtonState extends State<PrimaryButton> {
 
     return SizedBox(
       width: widget.fullWidth ? double.infinity : null,
-
       child: TextButton(
         onPressed: () {},
         style: ButtonStyle(
+          padding: WidgetStateProperty.all(
+            EdgeInsets.symmetric(horizontal: 16),
+          ),
           backgroundColor: WidgetStateProperty.all(AppColors.primaryColor),
           shape: WidgetStateProperty.all(
             RoundedRectangleBorder(
