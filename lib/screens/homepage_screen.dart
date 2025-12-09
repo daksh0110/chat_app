@@ -1,3 +1,5 @@
+import 'package:chat_app/data/dummyChatList.dart';
+import 'package:chat_app/modal/chat_litst_item.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/widgets/app_text.dart';
 import 'package:chat_app/widgets/homescreen/chat_list.dart';
@@ -9,6 +11,7 @@ class HomepageScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<ChatListItem> chatListItems = dummyMessages;
     return Scaffold(
       floatingActionButton: Transform.translate(
         offset: const Offset(-10, 0),
@@ -53,7 +56,7 @@ class HomepageScreen extends StatelessWidget {
           children: [
             const SizedBox(height: 20),
             HomepageNavigationBar(),
-            ChatList(),
+            ChatList(items: chatListItems),
           ],
         ),
       ),
