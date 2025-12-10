@@ -82,7 +82,7 @@ class _ChatListState extends State<ChatList> {
           itemBuilder: (context, index) {
             return ChatListTile(item: widget.items[index]);
           },
-          separatorBuilder: (context, index) => const SizedBox(height: 25),
+          separatorBuilder: (context, index) => const SizedBox(height: 20),
         ),
       ),
     );
