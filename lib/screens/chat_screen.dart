@@ -1,7 +1,9 @@
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/widgets/app_text.dart';
+import 'package:chat_app/widgets/chat_screen/chat_input_bar.dart';
 import 'package:chat_app/widgets/circle_bubble.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class ChatScreen extends StatelessWidget {
   final String userName;
@@ -83,7 +85,25 @@ class ChatScreen extends StatelessWidget {
         ],
       ),
 
-      body: const SafeArea(child: Center(child: Text('Chat body here'))),
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(16, 8, 16, 16),
+          child: Column(
+            children: [
+              AppText("text", color: AppColors.dangerColor),
+              Spacer(),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: ChatInputBar(
+                  onSend: (text) {
+                    // send message
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
