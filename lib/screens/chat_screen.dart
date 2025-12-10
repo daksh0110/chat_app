@@ -3,7 +3,6 @@ import 'package:chat_app/widgets/app_text.dart';
 import 'package:chat_app/widgets/chat_screen/chat_input_bar.dart';
 import 'package:chat_app/widgets/circle_bubble.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class ChatScreen extends StatelessWidget {
   final String userName;
@@ -32,7 +31,7 @@ class ChatScreen extends StatelessWidget {
         elevation: 0,
         titleSpacing: 0,
         leading: Padding(
-          padding: const EdgeInsets.only(left: 16.0),
+          padding: const EdgeInsets.only(left: 0),
           child: IconButton(
             onPressed: () => Navigator.of(context).pop(),
             icon: const Icon(Icons.arrow_back_ios),
