@@ -1,6 +1,7 @@
 import 'package:chat_app/screens/homepage_screen.dart';
 import 'package:chat_app/screens/onboarding_screen.dart';
 import 'package:chat_app/screens/register_screen.dart';
+import 'package:chat_app/screens/splash_screen.dart';
 import 'package:chat_app/screens/verify_screen.dart';
 import 'package:chat_app/screens/verify_success.dart';
 import 'package:chat_app/theme/app_colors.dart';
@@ -17,6 +18,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
 
       theme: ThemeData(
@@ -27,7 +29,9 @@ class MyApp extends StatelessWidget {
         primaryColor: Colors.blue,
         scaffoldBackgroundColor: AppColors.backgroundColor,
       ),
-      home: Scaffold(body: HomepageScreen()),
+      home: SplashScreen(),
+
+      routes: {'/home': (context) => HomepageScreen()},
     );
   }
 }
