@@ -1,4 +1,3 @@
-import 'package:chat_app/data/phraseData.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/widgets/app_text.dart';
 import 'package:chat_app/widgets/primary_button.dart';
@@ -65,7 +64,12 @@ class VerifyScreen extends StatelessWidget {
                   padding: EdgeInsets.fromLTRB(32, 8, 32, bottomPadding),
                   child: SafeArea(
                     top: false,
-                    child: PrimaryButton(text: "Verify"),
+                    child: PrimaryButton(
+                      text: "Verify",
+                      onCick: () {
+                        Navigator.pushNamed(context, "/verify-success");
+                      },
+                    ),
                   ),
                 ),
               ],

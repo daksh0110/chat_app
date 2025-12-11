@@ -6,13 +6,16 @@ class PrimaryInput extends StatelessWidget {
     super.key,
     required this.placeholderText,
     this.maxlines = 1,
+    this.readOnly = false,
   });
   final String placeholderText;
   final int maxlines;
+  final bool readOnly;
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      readOnly: readOnly,
       maxLines: maxlines,
       decoration: InputDecoration(
         filled: true,

@@ -57,8 +57,12 @@ class VerifySuccess extends StatelessWidget {
                 ),
               ),
 
-              // Button stays at the bottom
-              const PrimaryButton(text: "Finish"),
+              PrimaryButton(
+                text: "Finish",
+                onCick: () {
+                  Navigator.pushNamed(context, "/homepage");
+                },
+              ),
             ],
           ),
         ),

@@ -37,6 +37,7 @@ dependencies:
   dotted_border: ^3.1.0
   flutter_native_splash: ^2.4.7
   flutter_svg: ^2.2.3
+  word_generator: ^0.5.0
 
 dev_dependencies:
   flutter_test:

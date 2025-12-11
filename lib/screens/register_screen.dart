@@ -1,3 +1,4 @@
+import 'package:chat_app/data/phraseData.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/widgets/app_text.dart';
 import 'package:chat_app/widgets/primary_button.dart';
@@ -16,9 +17,8 @@ class RegisterScreen extends StatelessWidget {
       DropdownMenuEntry(value: 'male', label: "Male"),
       DropdownMenuEntry(value: 'female', label: "Female"),
     ];
-
+    final String phrase = phrases.map((p) => p.text).join(" ");
     return Scaffold(
-      // keep resizeToAvoidBottomInset true to let view adjust for keyboard
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -31,6 +31,8 @@ class RegisterScreen extends StatelessWidget {
                     child: Scrollbar(
                       thumbVisibility: false,
                       trackVisibility: false,
+                      thickness: 0,
+                      interactive: false,
                       child: SingleChildScrollView(
                         padding: const EdgeInsets.only(bottom: 24),
                         child: Column(
@@ -136,9 +138,9 @@ class RegisterScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 5),
                             PrimaryInput(
-                              placeholderText:
-                                  "storage executrix die contract suffering fool strain reign army frown raid nursery history node shelter decoration",
+                              placeholderText: phrase,
                               maxlines: 4,
+                              readOnly: true,
                             ),
                             const SizedBox(height: 5),
                             AppText(
@@ -183,7 +185,12 @@ class RegisterScreen extends StatelessWidget {
 
                   SizedBox(
                     width: double.infinity,
-                    child: PrimaryButton(text: "Continue"),
+                    child: PrimaryButton(
+                      text: "Continue",
+                      onCick: () {
+                        Navigator.pushNamed(context, '/verify');
+                      },
+                    ),
                   ),
                 ],
               ),
