@@ -5,6 +5,7 @@ import 'package:chat_app/screens/splash_screen.dart';
 import 'package:chat_app/screens/verify_screen.dart';
 import 'package:chat_app/screens/verify_success.dart';
 import 'package:chat_app/theme/app_colors.dart';
+import 'package:chat_app/utils/slide_page_route.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -31,7 +32,28 @@ class MyApp extends StatelessWidget {
       ),
       home: SplashScreen(),
 
-      routes: {'/home': (context) => HomepageScreen()},
+      onGenerateRoute: (RouteSettings settings) {
+        switch (settings.name) {
+          case '/onboarding':
+            return SlidePageRoute(page: OnboardingScreen());
+          case '/register':
+            return SlidePageRoute(page: RegisterScreen());
+          case '/verify':
+            return SlidePageRoute(page: VerifyScreen());
+          case '/verify-success':
+            return SlidePageRoute(page: VerifySuccess());
+          case '/homepage':
+            return SlidePageRoute(page: HomepageScreen());
+          default:
+            return MaterialPageRoute(
+              builder: (_) => Scaffold(
+                body: Center(
+                  child: Text('No route defined for ${settings.name}'),
+                ),
+              ),
+            );
+        }
+      },
     );
   }
 }

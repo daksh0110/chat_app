@@ -26,9 +26,10 @@ class HomepageScreen extends StatelessWidget {
       ),
 
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: AppColors.backgroundColor,
         title: Transform.translate(
-          offset: const Offset(10, 0),
+          offset: const Offset(20, 0),
           child: const AppText(
             "Chatx",
             color: AppColors.textMediumColor,

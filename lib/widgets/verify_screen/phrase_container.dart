@@ -21,6 +21,7 @@ class _PhraseContainerState extends State<PhraseContainer> {
   void initState() {
     super.initState();
     availablePhrases = List<Phrase>.from(phrases);
+    availablePhrases.shuffle();
   }
 
   void _addToBox(Phrase p) {

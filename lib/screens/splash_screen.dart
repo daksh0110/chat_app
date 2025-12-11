@@ -17,7 +17,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _loadData() async {
     await Future.delayed(Duration(seconds: 1));
 
-    Navigator.pushReplacementNamed(context, '/home');
+    Navigator.pushReplacementNamed(context, '/onboarding');
   }
 
   @override

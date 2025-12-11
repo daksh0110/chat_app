@@ -1,11 +1,7 @@
-import 'dart:io';
-
 import 'package:chat_app/modal/chat_litst_item.dart';
 import 'package:chat_app/screens/import_address_screem.dart';
 import 'package:chat_app/theme/app_colors.dart';
-import 'package:chat_app/utils/message_time.dart';
 import 'package:chat_app/widgets/app_text.dart';
-import 'package:chat_app/widgets/circle_bubble.dart';
 import 'package:chat_app/widgets/homescreen/chat_list_title.dart';
 import 'package:chat_app/widgets/popUp_modal.dart';
 import 'package:chat_app/widgets/primary_button.dart';
