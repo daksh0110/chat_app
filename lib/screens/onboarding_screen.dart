@@ -10,149 +10,154 @@ class OnboardingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        padding: EdgeInsets.fromLTRB(32, 64, 32, 32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Padding(
-              padding: EdgeInsetsGeometry.fromLTRB(0, 0, 32, 0),
-              child: const Text(
-                "Start a Fun Communication with Anonymity",
-
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primaryColor,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(32, 32, 32, 0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(right: 32),
+                child: Text(
+                  "Start a Fun Communication with Anonymity",
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primaryColor,
+                  ),
                 ),
               ),
-            ),
 
-            Expanded(
-              child: SizedBox(
-                width: double.infinity,
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Positioned(
-                      left: 120,
-                      top: 80,
-                      child: CircleBubble(
-                        height: 125,
-                        image: Image.asset(
-                          'assets/images/1.png',
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      left: -10,
-                      top: 120,
-                      child: CircleBubble(
-                        height: 100,
-                        image: Image.asset(
-                          'assets/images/2.png',
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      right: -40,
-                      top: 120,
-                      child: CircleBubble(
-                        height: 120,
-                        image: Image.asset(
-                          'assets/images/3.png',
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      left: -60,
-                      top: 225,
-                      child: CircleBubble(
-                        height: 100,
-                        image: Image.asset(
-                          'assets/images/4.png',
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      left: 80,
-                      top: 215,
-                      child: CircleBubble(
-                        height: 100,
-                        image: Image.asset(
-                          'assets/images/5.png',
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      right: 60,
-                      top: 210,
-                      child: CircleBubble(
-                        height: 90,
-                        image: Image.asset(
-                          'assets/images/6.png',
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final w = constraints.maxWidth;
+                    final h = constraints.maxHeight;
 
-                    Positioned(
-                      right: -40,
-                      bottom: 200,
+                    double bubble(double size) => (w * size).clamp(70.0, 160.0);
 
-                      child: CircleBubble(
-                        height: 100,
-                        image: Image.asset(
-                          'assets/images/7.png',
-                          fit: BoxFit.cover,
+                    return Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Positioned(
+                          left: w * 0.35,
+                          top: h * 0.15,
+                          child: CircleBubble(
+                            height: bubble(0.30),
+                            image: Image.asset(
+                              'assets/images/1.png',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-
-                    // Another random small bubble (example)
-                    Positioned(
-                      left: 1,
-                      bottom: 100,
-                      child: CircleBubble(
-                        height: 150,
-                        image: Image.asset(
-                          'assets/images/8.png',
-                          fit: BoxFit.cover,
+                        Positioned(
+                          left: w * -0.05,
+                          top: h * 0.22,
+                          child: CircleBubble(
+                            height: bubble(0.24),
+                            image: Image.asset(
+                              'assets/images/2.png',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                    Positioned(
-                      right: 60,
-                      bottom: 130,
-                      child: CircleBubble(
-                        height: 120,
-                        image: Image.asset(
-                          'assets/images/9.png',
-                          fit: BoxFit.cover,
+                        Positioned(
+                          right: w * -0.10,
+                          top: h * 0.22,
+                          child: CircleBubble(
+                            height: bubble(0.26),
+                            image: Image.asset(
+                              'assets/images/3.png',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Column(
-              children: [
-                PrimaryButton(
-                  text: 'Create an Account',
-                  onCick: () {
-                    Navigator.pushNamed(context, "/register");
+                        Positioned(
+                          left: w * -0.15,
+                          top: h * 0.40,
+                          child: CircleBubble(
+                            height: bubble(0.24),
+                            image: Image.asset(
+                              'assets/images/4.png',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          left: w * 0.20,
+                          top: h * 0.38,
+                          child: CircleBubble(
+                            height: bubble(0.24),
+                            image: Image.asset(
+                              'assets/images/5.png',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          right: w * 0.25,
+                          top: h * 0.37,
+                          child: CircleBubble(
+                            height: bubble(0.22),
+                            image: Image.asset(
+                              'assets/images/6.png',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          right: w * -0.10,
+                          bottom: h * 0.45,
+                          child: CircleBubble(
+                            height: bubble(0.24),
+                            image: Image.asset(
+                              'assets/images/7.png',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          left: w * 0.00,
+                          bottom: h * 0.25,
+                          child: CircleBubble(
+                            height: bubble(0.32),
+                            image: Image.asset(
+                              'assets/images/8.png',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          right: w * 0.15,
+                          bottom: h * 0.30,
+                          child: CircleBubble(
+                            height: bubble(0.26),
+                            image: Image.asset(
+                              'assets/images/9.png',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
                   },
                 ),
-                SecondaryButton(text: "Restore"),
-              ],
-            ),
-          ],
+              ),
+
+              Column(
+                children: [
+                  PrimaryButton(
+                    text: 'Create an Account',
+                    onCick: () {
+                      Navigator.pushNamed(context, "/register");
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  const SecondaryButton(text: "Restore"),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
