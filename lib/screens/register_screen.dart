@@ -4,7 +4,7 @@ import 'package:chat_app/widgets/app_text.dart';
 import 'package:chat_app/widgets/primary_button.dart';
 import 'package:chat_app/widgets/primary_dropdown.dart';
 import 'package:chat_app/widgets/primary_input.dart';
-import 'package:dotted_border/dotted_border.dart';
+import 'package:chat_app/widgets/register_screen/Upload_Image.dart';
 import 'package:flutter/material.dart';
 
 class RegisterScreen extends StatelessWidget {
@@ -12,7 +12,6 @@ class RegisterScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // move entries here (or keep them outside)
     final List<DropdownMenuEntry<String>> entries = [
       DropdownMenuEntry(value: 'male', label: "Male"),
       DropdownMenuEntry(value: 'female', label: "Female"),
@@ -50,31 +49,8 @@ class RegisterScreen extends StatelessWidget {
                                     fontWeight: FontWeight.w600,
                                   ),
                                   const SizedBox(height: 30),
-                                  DottedBorder(
-                                    options: RectDottedBorderOptions(
-                                      dashPattern: [5, 5],
-                                      borderPadding: EdgeInsets.all(64),
-                                      padding: EdgeInsets.all(16),
-                                      color: AppColors.secondaryColor,
-                                    ),
-                                    child: const Icon(
-                                      Icons.add,
-                                      color: AppColors.secondaryColor,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 20),
-                                  const AppText(
-                                    "Upload a Picture",
-                                    color: AppColors.textMediumColor,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 16,
-                                  ),
-                                  const SizedBox(height: 2),
-                                  const AppText(
-                                    "(Automatically created as an NFT asset)",
-                                    color: AppColors.textSmallColor,
-                                    fontSize: 12,
-                                  ),
+
+                                  UploadImage(),
                                 ],
                               ),
                             ),
