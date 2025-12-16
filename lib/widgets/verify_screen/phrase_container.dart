@@ -51,8 +51,8 @@ class _PhraseContainerState extends State<PhraseContainer> {
         const SizedBox(height: 5),
 
         Container(
+          constraints: BoxConstraints(minHeight: 200),
           width: double.infinity,
-          height: 200,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: AppColors.inputBoxColor,
