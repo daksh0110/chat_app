@@ -7,14 +7,20 @@ class PrimaryInput extends StatelessWidget {
     required this.placeholderText,
     this.maxlines = 1,
     this.readOnly = false,
+    this.controller,
+    this.validator,
   });
   final String placeholderText;
   final int maxlines;
   final bool readOnly;
+  final TextEditingController? controller;
+  final FormFieldValidator? validator;
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
+      validator: validator,
+      controller: controller,
       readOnly: readOnly,
       maxLines: maxlines,
       decoration: InputDecoration(
@@ -23,6 +29,7 @@ class PrimaryInput extends StatelessWidget {
         hintText: placeholderText,
         hintStyle: TextStyle(color: AppColors.placeholderTextColor),
         contentPadding: EdgeInsets.fromLTRB(8, 8, 8, 8),
+        errorStyle: TextStyle(color: AppColors.dangerColor),
 
         border: OutlineInputBorder(borderSide: BorderSide.none),
 
