@@ -6,8 +6,8 @@ import 'package:chat_app/widgets/verify_screen/phrase_box.dart';
 import 'package:flutter/material.dart';
 
 class PhraseContainer extends StatefulWidget {
-  const PhraseContainer({super.key});
-
+  const PhraseContainer({super.key, required this.onChanged});
+  final void Function(List<String>) onChanged;
   @override
   State<PhraseContainer> createState() => _PhraseContainerState();
 }
@@ -29,6 +29,7 @@ class _PhraseContainerState extends State<PhraseContainer> {
       availablePhrases.removeWhere((x) => x.id == p.id);
       phrasesInTheBox.add(p);
     });
+    _notify();
   }
 
   void _removeFromBox(Phrase p) {
@@ -36,6 +37,11 @@ class _PhraseContainerState extends State<PhraseContainer> {
       phrasesInTheBox.removeWhere((x) => x.id == p.id);
       availablePhrases.add(p);
     });
+    _notify();
+  }
+
+  void _notify() {
+    widget.onChanged(phrasesInTheBox.map((p) => p.text).toList());
   }
 
   @override
@@ -49,7 +55,6 @@ class _PhraseContainerState extends State<PhraseContainer> {
           fontSize: 12,
         ),
         const SizedBox(height: 5),
-
         Container(
           constraints: BoxConstraints(minHeight: 200),
           width: double.infinity,

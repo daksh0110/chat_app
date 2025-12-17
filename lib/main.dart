@@ -39,7 +39,8 @@ class MyApp extends StatelessWidget {
           case '/register':
             return SlidePageRoute(page: RegisterScreen());
           case '/verify':
-            return SlidePageRoute(page: VerifyScreen());
+            String phrase = settings.arguments as String;
+            return SlidePageRoute(page: VerifyScreen(phrase: phrase));
           case '/verify-success':
             return SlidePageRoute(page: VerifySuccess());
           case '/homepage':
