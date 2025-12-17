@@ -38,6 +38,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
+  final String phrase = phrases.map((p) => p.text).join(" ");
+
   void onSubmit() {
     final nickName = nickNameController.text.trim();
     if (_registerFormKey.currentState!.validate()) {
@@ -46,35 +48,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ).showSnackBar(const SnackBar(content: Text('Processing Data')));
     }
 
-    debugPrint('Nickname: $nickName');
-    debugPrint('Gender value: $genderValue');
-    debugPrint('Agreed to terms: $agreeToTerms');
-    if (selectedImage == null) {
-      debugPrint("Image needs to be selected");
-      return;
-    }
-    if (nickName.isEmpty) {
-      debugPrint('Nickname is required');
-      return;
-    }
-
-    if (genderValue == null) {
-      debugPrint('Gender is required');
-      return;
-    }
-
-    if (!agreeToTerms) {
-      debugPrint('You must agree to terms');
-      return;
-    }
-
-    Navigator.pushNamed(context, "/verify");
+    Navigator.pushNamed(context, "/verify", arguments: phrase);
   }
 
   @override
   Widget build(BuildContext context) {
-    final String phrase = phrases.map((p) => p.text).join(" ");
-
     return Scaffold(
       body: SafeArea(
         child: LayoutBuilder(
