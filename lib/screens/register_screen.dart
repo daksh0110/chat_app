@@ -1,4 +1,5 @@
 import 'package:chat_app/data/phraseData.dart';
+import 'package:chat_app/services/api_servcie.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/widgets/app_text.dart';
 import 'package:chat_app/widgets/primary_button.dart';
@@ -84,10 +85,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     SizedBox(height: 30),
                                     UploadImage(
                                       selectedImage: selectedImage,
-                                      onImageSelected: (image) {
+                                      onImageSelected: (XFile? image) async {
+                                        if (image == null) return;
+
                                         setState(() {
                                           selectedImage = image;
                                         });
+
+                                        await CloudinaryService.uploadImage(
+                                          image,
+                                        );
                                       },
                                     ),
                                   ],
