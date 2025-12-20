@@ -19,7 +19,7 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController nickNameController = TextEditingController();
-  final TextEditingController interestController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
 
   XFile? selectedImage;
 
@@ -47,9 +47,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Processing Data')));
+      Navigator.pushNamed(context, "/verify", arguments: phrase);
     }
-
-    Navigator.pushNamed(context, "/verify", arguments: phrase);
   }
 
   @override
@@ -167,23 +166,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                                   const SizedBox(height: 15),
                                   const AppText(
-                                    "WHAT ARE YOU INTERESTED IN",
+                                    "EMAIL",
                                     color: AppColors.textSmallColor,
                                     fontSize: 12,
                                   ),
                                   const SizedBox(height: 10),
 
                                   PrimaryInput(
-                                    placeholderText: "(optional)",
-                                    controller: interestController,
+                                    placeholderText: "Enter your email",
+                                    controller: emailController,
+                                    validator: (value) {
+                                      if (value == null ||
+                                          value.trim().isEmpty) {
+                                        return 'email is required';
+                                      }
+                                    },
                                   ),
 
                                   const SizedBox(height: 5),
-                                  const AppText(
-                                    "e.g Design, Photography, ... etc.",
-                                    color: AppColors.textSmallColor,
-                                    fontSize: 12,
-                                  ),
 
                                   const SizedBox(height: 20),
 

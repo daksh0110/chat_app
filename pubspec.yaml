@@ -42,6 +42,7 @@ dependencies:
   permission_handler: ^11.0.0
   cloudinary_api: ^1.1.1
   flutter_dotenv: ^6.0.0
+  http: ^1.6.0
 
 dev_dependencies:
   flutter_test:
