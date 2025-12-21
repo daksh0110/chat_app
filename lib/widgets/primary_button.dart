@@ -1,56 +1,57 @@
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
-class PrimaryButton extends StatefulWidget {
+class PrimaryButton extends StatelessWidget {
   const PrimaryButton({
     super.key,
     required this.text,
     this.fullWidth = true,
-    this.onCick,
+    this.onClick,
     this.backgroundColor = AppColors.primaryColor,
     this.textColor = Colors.white,
     this.borderColor = Colors.transparent,
+    this.loading = false,
   });
+
   final String text;
   final bool fullWidth;
-  final VoidCallback? onCick;
+  final VoidCallback? onClick;
   final Color backgroundColor;
   final Color textColor;
   final Color borderColor;
-  @override
-  State<PrimaryButton> createState() {
-    return _PrimaryButtonState();
-  }
-}
+  final bool loading;
 
-class _PrimaryButtonState extends State<PrimaryButton> {
   @override
   Widget build(BuildContext context) {
-    String buttonTitle = widget.text;
-
     return SizedBox(
-      width: widget.fullWidth ? double.infinity : null,
+      width: fullWidth ? double.infinity : null,
       child: TextButton(
-        onPressed: widget.onCick,
+        onPressed: loading ? null : onClick, // ✅ disable when loading
         style: ButtonStyle(
           padding: WidgetStateProperty.all(
-            EdgeInsets.symmetric(horizontal: 16),
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           ),
-          backgroundColor: WidgetStateProperty.all(widget.backgroundColor),
+          backgroundColor: WidgetStateProperty.all(backgroundColor),
           shape: WidgetStateProperty.all(
             RoundedRectangleBorder(
-              borderRadius: BorderRadiusGeometry.circular(6),
-              side: BorderSide(color: widget.borderColor),
+              borderRadius: BorderRadius.circular(6),
+              side: BorderSide(color: borderColor),
             ),
           ),
         ),
-        child: Text(
-          buttonTitle,
-          style: TextStyle(
-            color: widget.textColor,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
+        child: loading
+            ? const SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
+            : Text(
+                text,
+                style: TextStyle(color: textColor, fontWeight: FontWeight.w400),
+              ),
       ),
     );
   }

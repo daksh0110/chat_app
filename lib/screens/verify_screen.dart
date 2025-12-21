@@ -76,7 +76,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
 
             Padding(
               padding: EdgeInsets.fromLTRB(32, 8, 32, bottomPadding),
-              child: PrimaryButton(text: "Verify", onCick: _verifyPhrase),
+              child: PrimaryButton(text: "Verify", onClick: _verifyPhrase),
             ),
           ],
         ),

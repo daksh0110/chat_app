@@ -1,11 +1,15 @@
 import 'package:chat_app/data/phraseData.dart';
-import 'package:chat_app/services/api_servcie.dart';
+import 'package:chat_app/modal/register_data.dart';
+import 'package:chat_app/services/api_client.dart';
+import 'package:chat_app/services/authentication_api_servcie.dart';
+import 'package:chat_app/services/cloudinary_api_servcie.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/widgets/app_text.dart';
 import 'package:chat_app/widgets/primary_button.dart';
 import 'package:chat_app/widgets/primary_dropdown.dart';
 import 'package:chat_app/widgets/primary_input.dart';
 import 'package:chat_app/widgets/register_screen/Upload_Image.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -19,7 +23,9 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController nickNameController = TextEditingController();
-  final TextEditingController interestController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final authApi = AuthenticationApiServcie(dio: ApiClient.dio);
+  bool loading = false;
 
   XFile? selectedImage;
 
@@ -36,20 +42,49 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   void dispose() {
     nickNameController.dispose();
+    emailController.dispose();
     super.dispose();
   }
 
   final String phrase = phrases.map((p) => p.text).join(" ");
 
-  void onSubmit() {
-    final nickName = nickNameController.text.trim();
-    if (_registerFormKey.currentState!.validate()) {
+  Future<void> onSubmit() async {
+    if (!_registerFormKey.currentState!.validate()) return;
+
+    if (selectedImage == null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Processing Data')));
+      ).showSnackBar(const SnackBar(content: Text('Please select an image')));
+      return;
     }
 
-    Navigator.pushNamed(context, "/verify", arguments: phrase);
+    setState(() => loading = true);
+
+    try {
+      final imageUrl = await CloudinaryService.uploadImage(selectedImage!);
+
+      final payload = RegisterData(
+        name: nickNameController.text.trim(),
+        email: emailController.text.trim(),
+        gender: genderValue ?? '',
+        userMainImageUri: imageUrl,
+        keyPhrase: phrase,
+      );
+
+      await authApi.register(payload);
+
+      if (!mounted) return;
+      Navigator.pushNamed(context, "/verify", arguments: phrase);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
+    } finally {
+      if (mounted) {
+        setState(() => loading = false);
+      }
+    }
   }
 
   @override
@@ -91,10 +126,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                         setState(() {
                                           selectedImage = image;
                                         });
-
-                                        await CloudinaryService.uploadImage(
-                                          image,
-                                        );
                                       },
                                     ),
                                   ],
@@ -167,23 +198,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                                   const SizedBox(height: 15),
                                   const AppText(
-                                    "WHAT ARE YOU INTERESTED IN",
+                                    "EMAIL",
                                     color: AppColors.textSmallColor,
                                     fontSize: 12,
                                   ),
                                   const SizedBox(height: 10),
 
                                   PrimaryInput(
-                                    placeholderText: "(optional)",
-                                    controller: interestController,
+                                    placeholderText: "Enter your email",
+                                    controller: emailController,
+                                    validator: (value) {
+                                      if (value == null ||
+                                          value.trim().isEmpty) {
+                                        return 'email is required';
+                                      }
+                                    },
                                   ),
 
                                   const SizedBox(height: 5),
-                                  const AppText(
-                                    "e.g Design, Photography, ... etc.",
-                                    color: AppColors.textSmallColor,
-                                    fontSize: 12,
-                                  ),
 
                                   const SizedBox(height: 20),
 
@@ -311,7 +343,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                   SizedBox(
                     width: double.infinity,
-                    child: PrimaryButton(text: "Continue", onCick: onSubmit),
+                    child: PrimaryButton(
+                      text: "Continue",
+                      onClick: onSubmit,
+                      loading: loading,
+                    ),
                   ),
                 ],
               ),

@@ -46,7 +46,7 @@ class _ChatListState extends State<ChatList> {
               PrimaryButton(
                 text: "Enable Public url",
                 fullWidth: false,
-                onCick: () => {showPopup()},
+                onClick: () => {showPopup()},
               ),
               const SizedBox(height: 10),
               const AppText("or", color: AppColors.placeholderTextColor),
