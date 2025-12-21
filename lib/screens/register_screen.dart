@@ -25,6 +25,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController nickNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final authApi = AuthenticationApiServcie(dio: ApiClient.dio);
+  bool loading = false;
 
   XFile? selectedImage;
 
@@ -41,6 +42,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   void dispose() {
     nickNameController.dispose();
+    emailController.dispose();
     super.dispose();
   }
 
@@ -56,8 +58,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
+    setState(() => loading = true);
+
     try {
       final imageUrl = await CloudinaryService.uploadImage(selectedImage!);
+
       final payload = RegisterData(
         name: nickNameController.text.trim(),
         email: emailController.text.trim(),
@@ -65,10 +70,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         userMainImageUri: imageUrl,
         keyPhrase: phrase,
       );
-      print(payload);
 
-      final Response = await authApi.register(payload);
-      print(Response);
+      await authApi.register(payload);
+
       if (!mounted) return;
       Navigator.pushNamed(context, "/verify", arguments: phrase);
     } catch (e) {
@@ -76,6 +80,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(e.toString())));
+    } finally {
+      if (mounted) {
+        setState(() => loading = false);
+      }
     }
   }
 
@@ -335,7 +343,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                   SizedBox(
                     width: double.infinity,
-                    child: PrimaryButton(text: "Continue", onCick: onSubmit),
+                    child: PrimaryButton(
+                      text: "Continue",
+                      onClick: onSubmit,
+                      loading: loading,
+                    ),
                   ),
                 ],
               ),

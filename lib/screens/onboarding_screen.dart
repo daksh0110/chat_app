@@ -148,7 +148,7 @@ class OnboardingScreen extends StatelessWidget {
                 children: [
                   PrimaryButton(
                     text: 'Create an Account',
-                    onCick: () {
+                    onClick: () {
                       Navigator.pushNamed(context, "/register");
                     },
                   ),
