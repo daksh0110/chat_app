@@ -1,11 +1,15 @@
 import 'package:chat_app/data/phraseData.dart';
-import 'package:chat_app/services/api_servcie.dart';
+import 'package:chat_app/modal/register_data.dart';
+import 'package:chat_app/services/api_client.dart';
+import 'package:chat_app/services/authentication_api_servcie.dart';
+import 'package:chat_app/services/cloudinary_api_servcie.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/widgets/app_text.dart';
 import 'package:chat_app/widgets/primary_button.dart';
 import 'package:chat_app/widgets/primary_dropdown.dart';
 import 'package:chat_app/widgets/primary_input.dart';
 import 'package:chat_app/widgets/register_screen/Upload_Image.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -20,6 +24,7 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController nickNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
+  final authApi = AuthenticationApiServcie(dio: ApiClient.dio);
 
   XFile? selectedImage;
 
@@ -41,13 +46,36 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   final String phrase = phrases.map((p) => p.text).join(" ");
 
-  void onSubmit() {
-    final nickName = nickNameController.text.trim();
-    if (_registerFormKey.currentState!.validate()) {
+  Future<void> onSubmit() async {
+    if (!_registerFormKey.currentState!.validate()) return;
+
+    if (selectedImage == null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Processing Data')));
+      ).showSnackBar(const SnackBar(content: Text('Please select an image')));
+      return;
+    }
+
+    try {
+      final imageUrl = await CloudinaryService.uploadImage(selectedImage!);
+      final payload = RegisterData(
+        name: nickNameController.text.trim(),
+        email: emailController.text.trim(),
+        gender: genderValue ?? '',
+        userMainImageUri: imageUrl,
+        keyPhrase: phrase,
+      );
+      print(payload);
+
+      final Response = await authApi.register(payload);
+      print(Response);
+      if (!mounted) return;
       Navigator.pushNamed(context, "/verify", arguments: phrase);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
     }
   }
 
@@ -90,10 +118,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                         setState(() {
                                           selectedImage = image;
                                         });
-
-                                        await CloudinaryService.uploadImage(
-                                          image,
-                                        );
                                       },
                                     ),
                                   ],

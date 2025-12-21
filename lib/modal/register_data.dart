@@ -17,23 +17,23 @@ class RegisterData {
 
   factory RegisterData.fromJson(Map<String, dynamic> json) {
     return RegisterData(
-      userMainImageUri: json['user_main_image_uri'] as String?,
+      userMainImageUri: json['userMainImageUri'] as String?,
       name: json['name'] as String,
       gender: json['gender'] as String,
       email: json['email'] as String,
-      emailVerified: json['email_verified'] as bool? ?? false,
-      keyPhrase: json['key_phrase'] as String,
+      emailVerified: json['emailVerified'] as bool? ?? false,
+      keyPhrase: json['keyPhrase'] as String,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'user_main_image_uri': userMainImageUri,
+      'userMainImageUri': userMainImageUri,
       'name': name,
       'gender': gender,
       'email': email,
-      'email_verified': emailVerified,
-      'key_phrase': keyPhrase,
+      'emailVerified': emailVerified,
+      'keyPhrase': keyPhrase,
     };
   }
 }
