@@ -1,3 +1,5 @@
+import 'package:chat_app/screens/email_screen.dart';
+import 'package:chat_app/screens/email_verification.dart';
 import 'package:chat_app/screens/homepage_screen.dart';
 import 'package:chat_app/screens/onboarding_screen.dart';
 import 'package:chat_app/screens/register_screen.dart';
@@ -38,6 +40,11 @@ class MyApp extends StatelessWidget {
         switch (settings.name) {
           case '/onboarding':
             return SlidePageRoute(page: OnboardingScreen());
+          case '/email':
+            return SlidePageRoute(page: EmailScreen());
+          case '/email-verification':
+            String email = settings.arguments as String;
+            return SlidePageRoute(page: EmailVerificationScreen(email: email));
           case '/register':
             return SlidePageRoute(page: RegisterScreen());
           case '/verify':
