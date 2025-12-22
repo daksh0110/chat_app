@@ -149,7 +149,7 @@ class OnboardingScreen extends StatelessWidget {
                   PrimaryButton(
                     text: 'Create an Account',
                     onClick: () {
-                      Navigator.pushNamed(context, "/register");
+                      Navigator.pushNamed(context, "/email");
                     },
                   ),
                   const SizedBox(height: 12),
