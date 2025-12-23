@@ -1,3 +1,5 @@
+import 'package:chat_app/services/api_client.dart';
+import 'package:chat_app/services/authentication_api_servcie.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/widgets/app_text.dart';
 import 'package:chat_app/widgets/primary_button.dart';
@@ -14,6 +16,7 @@ class EmailScreen extends StatefulWidget {
 class _EmailScreenState extends State<EmailScreen> {
   final TextEditingController emailController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  final authApi = AuthenticationApiServcie(dio: ApiClient.dio);
 
   @override
   void dispose() {
@@ -21,14 +24,27 @@ class _EmailScreenState extends State<EmailScreen> {
     super.dispose();
   }
 
-  void onContinue() {
+  void onContinue() async {
     if (!_formKey.currentState!.validate()) return;
 
-    Navigator.pushNamed(
-      context,
-      "/email-verification",
-      arguments: emailController.text.trim(),
-    );
+    final response = await authApi.sendOtp(email: emailController.text.trim());
+
+    if (response.statusCode == 200) {
+      await Navigator.pushNamed(
+        context,
+        "/email-verification",
+        arguments: emailController.text.trim(),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: AppText(
+            response.data["message"],
+            color: AppColors.placeholderTextColor,
+          ),
+        ),
+      );
+    }
   }
 
   @override
