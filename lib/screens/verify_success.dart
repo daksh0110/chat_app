@@ -59,7 +59,7 @@ class VerifySuccess extends StatelessWidget {
 
               PrimaryButton(
                 text: "Finish",
-                onCick: () {
+                onClick: () {
                   Navigator.pushNamed(context, "/homepage");
                 },
               ),

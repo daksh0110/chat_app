@@ -1,3 +1,4 @@
+import 'package:chat_app/services/secure_storage.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/widgets/app_text.dart';
 import 'package:flutter/material.dart';
@@ -15,9 +16,13 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _loadData() async {
-    await Future.delayed(Duration(seconds: 1));
-
-    Navigator.pushReplacementNamed(context, '/onboarding');
+    final storage = SecureStorage();
+    final token = await storage.getData(key: "accessToken");
+    if (token != null && token.isNotEmpty) {
+      Navigator.pushReplacementNamed(context, '/homepage');
+    } else {
+      Navigator.pushReplacementNamed(context, '/onboarding');
+    }
   }
 
   @override

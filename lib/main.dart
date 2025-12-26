@@ -1,3 +1,5 @@
+import 'package:chat_app/screens/email_screen.dart';
+import 'package:chat_app/screens/email_verification.dart';
 import 'package:chat_app/screens/homepage_screen.dart';
 import 'package:chat_app/screens/onboarding_screen.dart';
 import 'package:chat_app/screens/register_screen.dart';
@@ -7,8 +9,10 @@ import 'package:chat_app/screens/verify_success.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/utils/slide_page_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
+void main() async {
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 
@@ -36,12 +40,19 @@ class MyApp extends StatelessWidget {
         switch (settings.name) {
           case '/onboarding':
             return SlidePageRoute(page: OnboardingScreen());
+          case '/email':
+            return SlidePageRoute(page: EmailScreen());
+          case '/email-verification':
+            String email = settings.arguments as String;
+            return SlidePageRoute(page: EmailVerificationScreen(email: email));
           case '/register':
-            return SlidePageRoute(page: RegisterScreen());
-          case '/verify':
-            return SlidePageRoute(page: VerifyScreen());
-          case '/verify-success':
-            return SlidePageRoute(page: VerifySuccess());
+            String email = settings.arguments as String;
+            return SlidePageRoute(page: RegisterScreen(email: email));
+          // case '/verify':
+          //   String phrase = settings.arguments as String;
+          //   return SlidePageRoute(page: VerifyScreen(phrase: phrase));
+          // case '/verify-success':
+          //   return SlidePageRoute(page: VerifySuccess());
           case '/homepage':
             return SlidePageRoute(page: HomepageScreen());
           default:

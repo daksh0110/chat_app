@@ -1,4 +1,9 @@
 import 'package:chat_app/data/phraseData.dart';
+import 'package:chat_app/modal/register_data.dart';
+import 'package:chat_app/services/api_client.dart';
+import 'package:chat_app/services/authentication_api_servcie.dart';
+import 'package:chat_app/services/cloudinary_api_servcie.dart';
+import 'package:chat_app/services/secure_storage.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/widgets/app_text.dart';
 import 'package:chat_app/widgets/primary_button.dart';
@@ -10,15 +15,18 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+  const RegisterScreen({super.key, required this.email});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
+  final String email;
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController nickNameController = TextEditingController();
-  final TextEditingController interestController = TextEditingController();
+  final authApi = AuthenticationApiServcie(dio: ApiClient.dio);
+  bool loading = false;
+  final secureStorage = SecureStorage();
 
   XFile? selectedImage;
 
@@ -38,43 +46,56 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  void onSubmit() {
-    final nickName = nickNameController.text.trim();
-    if (_registerFormKey.currentState!.validate()) {
+  final String phrase = phrases.map((p) => p.text).join(" ");
+
+  Future<void> onSubmit() async {
+    if (!_registerFormKey.currentState!.validate()) return;
+
+    if (selectedImage == null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Processing Data')));
-    }
-
-    debugPrint('Nickname: $nickName');
-    debugPrint('Gender value: $genderValue');
-    debugPrint('Agreed to terms: $agreeToTerms');
-    if (selectedImage == null) {
-      debugPrint("Image needs to be selected");
-      return;
-    }
-    if (nickName.isEmpty) {
-      debugPrint('Nickname is required');
+      ).showSnackBar(const SnackBar(content: Text('Please select an image')));
       return;
     }
 
-    if (genderValue == null) {
-      debugPrint('Gender is required');
-      return;
-    }
+    setState(() => loading = true);
 
-    if (!agreeToTerms) {
-      debugPrint('You must agree to terms');
-      return;
-    }
+    try {
+      final imageUrl = await CloudinaryService.uploadImage(selectedImage!);
 
-    Navigator.pushNamed(context, "/verify");
+      final payload = RegisterData(
+        name: nickNameController.text.trim(),
+        email: widget.email,
+        gender: genderValue ?? '',
+        userMainImageUri: imageUrl,
+        keyPhrase: phrase,
+        emailVerified: true,
+      );
+      if (!mounted) return;
+
+      final response = await authApi.register(payload);
+      print(response);
+      if (response.statusCode == 200) {
+        secureStorage.setData(
+          key: "accessToken",
+          name: response.data["message"],
+        );
+        Navigator.pushNamed(context, "/homepage");
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
+    } finally {
+      if (mounted) {
+        setState(() => loading = false);
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final String phrase = phrases.map((p) => p.text).join(" ");
-
     return Scaffold(
       body: SafeArea(
         child: LayoutBuilder(
@@ -106,7 +127,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     SizedBox(height: 30),
                                     UploadImage(
                                       selectedImage: selectedImage,
-                                      onImageSelected: (image) {
+                                      onImageSelected: (XFile? image) async {
+                                        if (image == null) return;
+
                                         setState(() {
                                           selectedImage = image;
                                         });
@@ -181,24 +204,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   ),
 
                                   const SizedBox(height: 15),
-                                  const AppText(
-                                    "WHAT ARE YOU INTERESTED IN",
-                                    color: AppColors.textSmallColor,
-                                    fontSize: 12,
-                                  ),
-                                  const SizedBox(height: 10),
-
-                                  PrimaryInput(
-                                    placeholderText: "(optional)",
-                                    controller: interestController,
-                                  ),
-
-                                  const SizedBox(height: 5),
-                                  const AppText(
-                                    "e.g Design, Photography, ... etc.",
-                                    color: AppColors.textSmallColor,
-                                    fontSize: 12,
-                                  ),
 
                                   const SizedBox(height: 20),
 
@@ -326,7 +331,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                   SizedBox(
                     width: double.infinity,
-                    child: PrimaryButton(text: "Continue", onCick: onSubmit),
+                    child: PrimaryButton(
+                      text: "Continue",
+                      onClick: onSubmit,
+                      loading: loading,
+                    ),
                   ),
                 ],
               ),
