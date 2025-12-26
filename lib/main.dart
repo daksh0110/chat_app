@@ -46,12 +46,13 @@ class MyApp extends StatelessWidget {
             String email = settings.arguments as String;
             return SlidePageRoute(page: EmailVerificationScreen(email: email));
           case '/register':
-            return SlidePageRoute(page: RegisterScreen());
-          case '/verify':
-            String phrase = settings.arguments as String;
-            return SlidePageRoute(page: VerifyScreen(phrase: phrase));
-          case '/verify-success':
-            return SlidePageRoute(page: VerifySuccess());
+            String email = settings.arguments as String;
+            return SlidePageRoute(page: RegisterScreen(email: email));
+          // case '/verify':
+          //   String phrase = settings.arguments as String;
+          //   return SlidePageRoute(page: VerifyScreen(phrase: phrase));
+          // case '/verify-success':
+          //   return SlidePageRoute(page: VerifySuccess());
           case '/homepage':
             return SlidePageRoute(page: HomepageScreen());
           default:

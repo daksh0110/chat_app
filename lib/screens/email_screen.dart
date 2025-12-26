@@ -17,7 +17,7 @@ class _EmailScreenState extends State<EmailScreen> {
   final TextEditingController emailController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   final authApi = AuthenticationApiServcie(dio: ApiClient.dio);
-
+  bool loading = false;
   @override
   void dispose() {
     emailController.dispose();
@@ -26,7 +26,9 @@ class _EmailScreenState extends State<EmailScreen> {
 
   void onContinue() async {
     if (!_formKey.currentState!.validate()) return;
-
+    setState(() {
+      loading = true;
+    });
     final response = await authApi.sendOtp(email: emailController.text.trim());
 
     if (response.statusCode == 200) {
@@ -45,6 +47,9 @@ class _EmailScreenState extends State<EmailScreen> {
         ),
       );
     }
+    setState(() {
+      loading = false;
+    });
   }
 
   @override
@@ -109,6 +114,7 @@ class _EmailScreenState extends State<EmailScreen> {
                       child: PrimaryButton(
                         text: "Continue",
                         onClick: onContinue,
+                        loading: loading,
                       ),
                     ),
                   ],

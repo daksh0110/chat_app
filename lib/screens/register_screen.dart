@@ -3,29 +3,30 @@ import 'package:chat_app/modal/register_data.dart';
 import 'package:chat_app/services/api_client.dart';
 import 'package:chat_app/services/authentication_api_servcie.dart';
 import 'package:chat_app/services/cloudinary_api_servcie.dart';
+import 'package:chat_app/services/secure_storage.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/widgets/app_text.dart';
 import 'package:chat_app/widgets/primary_button.dart';
 import 'package:chat_app/widgets/primary_dropdown.dart';
 import 'package:chat_app/widgets/primary_input.dart';
 import 'package:chat_app/widgets/register_screen/Upload_Image.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+  const RegisterScreen({super.key, required this.email});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
+  final String email;
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController nickNameController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
   final authApi = AuthenticationApiServcie(dio: ApiClient.dio);
   bool loading = false;
+  final secureStorage = SecureStorage();
 
   XFile? selectedImage;
 
@@ -42,7 +43,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   void dispose() {
     nickNameController.dispose();
-    emailController.dispose();
     super.dispose();
   }
 
@@ -65,16 +65,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       final payload = RegisterData(
         name: nickNameController.text.trim(),
-        email: emailController.text.trim(),
+        email: widget.email,
         gender: genderValue ?? '',
         userMainImageUri: imageUrl,
         keyPhrase: phrase,
+        emailVerified: true,
       );
-
-      await authApi.register(payload);
-
       if (!mounted) return;
-      Navigator.pushNamed(context, "/verify", arguments: phrase);
+
+      final response = await authApi.register(payload);
+      print(response);
+      if (response.statusCode == 200) {
+        secureStorage.setData(
+          key: "accessToken",
+          name: response.data["message"],
+        );
+        Navigator.pushNamed(context, "/homepage");
+      }
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(
@@ -197,25 +204,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   ),
 
                                   const SizedBox(height: 15),
-                                  const AppText(
-                                    "EMAIL",
-                                    color: AppColors.textSmallColor,
-                                    fontSize: 12,
-                                  ),
-                                  const SizedBox(height: 10),
-
-                                  PrimaryInput(
-                                    placeholderText: "Enter your email",
-                                    controller: emailController,
-                                    validator: (value) {
-                                      if (value == null ||
-                                          value.trim().isEmpty) {
-                                        return 'email is required';
-                                      }
-                                    },
-                                  ),
-
-                                  const SizedBox(height: 5),
 
                                   const SizedBox(height: 20),
 

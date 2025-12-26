@@ -32,7 +32,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       otp: _otpController.text,
     );
     if (response.statusCode == 200) {
-      Navigator.pushNamed(context, "/register");
+      Navigator.pushNamed(context, "/register", arguments: widget.email);
     } else {
       print("this is the repsonse ${response.data}");
       ScaffoldMessenger.of(context).showSnackBar(
