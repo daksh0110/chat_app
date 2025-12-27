@@ -1,5 +1,6 @@
 import 'package:chat_app/data/dummyChatList.dart';
 import 'package:chat_app/modal/chat_litst_item.dart';
+import 'package:chat_app/screens/search_user_screen.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/widgets/app_text.dart';
 import 'package:chat_app/widgets/homescreen/chat_list.dart';
@@ -11,12 +12,16 @@ class HomepageScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<ChatListItem> chatListItems = dummyMessages;
+    List<ChatListItem> chatListItems = [];
+    void openSearchUserScreen() {
+      Navigator.of(context).pushNamed('/search-user');
+    }
+
     return Scaffold(
       floatingActionButton: Transform.translate(
         offset: const Offset(-10, 0),
         child: FloatingActionButton(
-          onPressed: () {},
+          onPressed: openSearchUserScreen,
           backgroundColor: AppColors.textMediumColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(50),

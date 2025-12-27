@@ -3,6 +3,7 @@ import 'package:chat_app/screens/email_verification.dart';
 import 'package:chat_app/screens/homepage_screen.dart';
 import 'package:chat_app/screens/onboarding_screen.dart';
 import 'package:chat_app/screens/register_screen.dart';
+import 'package:chat_app/screens/search_user_screen.dart';
 import 'package:chat_app/screens/splash_screen.dart';
 import 'package:chat_app/screens/verify_screen.dart';
 import 'package:chat_app/screens/verify_success.dart';
@@ -55,6 +56,8 @@ class MyApp extends StatelessWidget {
           //   return SlidePageRoute(page: VerifySuccess());
           case '/homepage':
             return SlidePageRoute(page: HomepageScreen());
+          case '/search-user':
+            return SlidePageRoute(page: SearchUserScreen());
           default:
             return MaterialPageRoute(
               builder: (_) => Scaffold(
