@@ -57,7 +57,7 @@ class _EmailScreenState extends State<EmailScreen> {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(32, 32, 32, 8),
+          padding: const EdgeInsets.fromLTRB(32, 32, 32, 0),
           child: Column(
             children: [
               Expanded(

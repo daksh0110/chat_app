@@ -11,7 +11,6 @@ class SearchListObject extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(" Item  $item");
     return InkWell(
       onTap: () {
         Navigator.of(context).push(
@@ -27,7 +26,7 @@ class SearchListObject extends StatelessWidget {
             SizedBox(
               width: 50,
               height: 50,
-              child: CircleBubble(imageProvider: item.userMainImageUri),
+              child: CircleBubble(imageProvider: item.userMainImageUrl),
             ),
             const SizedBox(width: 10),
 
