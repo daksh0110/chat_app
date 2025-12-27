@@ -80,7 +80,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           key: "accessToken",
           name: response.data["message"],
         );
-        Navigator.pushNamed(context, "/homepage");
+        Navigator.pushReplacementNamed(context, "/homepage");
       }
     } catch (e) {
       if (!mounted) return;

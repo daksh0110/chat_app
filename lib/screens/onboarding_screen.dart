@@ -152,8 +152,6 @@ class OnboardingScreen extends StatelessWidget {
                       Navigator.pushNamed(context, "/email");
                     },
                   ),
-                  const SizedBox(height: 12),
-                  const SecondaryButton(text: "Restore"),
                 ],
               ),
             ],
