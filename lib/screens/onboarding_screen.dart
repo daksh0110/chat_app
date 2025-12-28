@@ -1,7 +1,6 @@
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/widgets/circle_bubble.dart';
 import 'package:chat_app/widgets/primary_button.dart';
-import 'package:chat_app/widgets/secondary_button.dart';
 import 'package:flutter/material.dart';
 
 class OnboardingScreen extends StatelessWidget {
@@ -147,7 +146,7 @@ class OnboardingScreen extends StatelessWidget {
               Column(
                 children: [
                   PrimaryButton(
-                    text: 'Create an Account',
+                    text: 'Continue',
                     onClick: () {
                       Navigator.pushNamed(context, "/email");
                     },

@@ -5,7 +5,6 @@ import 'package:chat_app/widgets/app_text.dart';
 import 'package:chat_app/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
   const EmailVerificationScreen({super.key, required this.email});
@@ -19,6 +18,7 @@ class EmailVerificationScreen extends StatefulWidget {
 class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   final TextEditingController _otpController = TextEditingController();
   final authApi = AuthenticationApiServcie(dio: ApiClient.dio);
+  bool loading = false;
   @override
   void dispose() {
     _otpController.dispose();
@@ -27,14 +27,33 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
 
   void onVerify() async {
     if (_otpController.text.length != 6) return;
+    setState(() {
+      loading = true;
+    });
     final response = await authApi.verifyOtp(
       email: widget.email,
       otp: _otpController.text,
     );
     if (response.statusCode == 200) {
-      Navigator.pushNamed(context, "/register", arguments: widget.email);
+      setState(() {
+        loading = false;
+      });
+      print(response.data.toString());
+      if (response.data["data"]["userExist"] == true) {
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          "/homepage",
+          (route) => false,
+        );
+      } else {
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          "/register",
+          (route) => false,
+          arguments: widget.email,
+        );
+      }
     } else {
-      print("this is the repsonse ${response.data}");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: AppText(
@@ -149,7 +168,11 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
               /// BOTTOM BUTTON (NOT CENTERED)
               SizedBox(
                 width: double.infinity,
-                child: PrimaryButton(text: "Verify", onClick: onVerify),
+                child: PrimaryButton(
+                  text: "Verify",
+                  onClick: onVerify,
+                  loading: loading,
+                ),
               ),
             ],
           ),
