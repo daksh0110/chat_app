@@ -11,4 +11,8 @@ class SecureStorage {
     final response = await storage.read(key: key);
     return response;
   }
+
+  Future clearAll() async {
+    await storage.deleteAll();
+  }
 }

@@ -1,11 +1,13 @@
+import 'dart:async';
+
 import 'package:chat_app/services/api_client.dart';
 import 'package:chat_app/services/authentication_api_servcie.dart';
+import 'package:chat_app/services/secure_storage.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/widgets/app_text.dart';
 import 'package:chat_app/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
   const EmailVerificationScreen({super.key, required this.email});
@@ -19,30 +21,122 @@ class EmailVerificationScreen extends StatefulWidget {
 class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   final TextEditingController _otpController = TextEditingController();
   final authApi = AuthenticationApiServcie(dio: ApiClient.dio);
+  final secureStorage = SecureStorage();
+  bool canResend = false;
+
+  Timer? _timer;
+  int _remainingSeconds = 30;
+  bool loading = false;
   @override
   void dispose() {
     _otpController.dispose();
     super.dispose();
   }
 
+  void initState() {
+    super.initState();
+    canResend = false;
+    _remainingSeconds = 30;
+
+    const oneSecond = Duration(seconds: 1);
+    _timer = Timer.periodic(oneSecond, (Timer timer) {
+      if (_remainingSeconds <= 1) {
+        timer.cancel();
+        setState(() {
+          _remainingSeconds = 0;
+          canResend = true;
+        });
+      } else {
+        setState(() {
+          _remainingSeconds--;
+        });
+      }
+    });
+  }
+
+  void resendOtp() async {
+    if (!canResend) return;
+
+    setState(() {
+      canResend = false;
+      _remainingSeconds = 30;
+    });
+
+    final response = await authApi.sendOtp(email: widget.email);
+
+    if (response.success) {
+      const oneSecond = Duration(seconds: 1);
+
+      _timer?.cancel();
+      _timer = Timer.periodic(oneSecond, (Timer timer) {
+        if (_remainingSeconds <= 1) {
+          timer.cancel();
+          setState(() {
+            _remainingSeconds = 0;
+            canResend = true;
+          });
+        } else {
+          setState(() {
+            _remainingSeconds--;
+          });
+        }
+      });
+    } else {
+      setState(() {
+        canResend = true;
+      });
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(response.message)));
+    }
+  }
+
   void onVerify() async {
     if (_otpController.text.length != 6) return;
+
+    setState(() {
+      loading = true;
+    });
+
     final response = await authApi.verifyOtp(
       email: widget.email,
       otp: _otpController.text,
     );
-    if (response.statusCode == 200) {
-      Navigator.pushNamed(context, "/register", arguments: widget.email);
-    } else {
-      print("this is the repsonse ${response.data}");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: AppText(
-            response.data["message"],
-            color: AppColors.placeholderTextColor,
-          ),
-        ),
-      );
+
+    setState(() {
+      loading = false;
+    });
+
+    if (response.success == true) {
+      final data = response.data;
+
+      if (data != null && data.userExist == true) {
+        secureStorage.setData(key: "accessToken", name: data.accessToken ?? '');
+        secureStorage.setData(key: "deviceId", name: data.deviceId ?? '');
+        secureStorage.setData(
+          key: 'refreshToken',
+          name: data.refreshToken ?? '',
+        );
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          "/homepage",
+          (route) => false,
+        );
+      } else {
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          "/register",
+          (route) => false,
+          arguments: widget.email,
+        );
+      }
+    }
+    // ❌ ERROR CASE
+    else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(response.message)));
     }
   }
 
@@ -133,10 +227,16 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
-                          onPressed: () {},
-                          child: const AppText(
-                            "Resend code",
-                            color: AppColors.primaryColor,
+                          onPressed: canResend
+                              ? resendOtp
+                              : null, // 👈 THIS disables it
+                          child: AppText(
+                            canResend
+                                ? "Resend code"
+                                : "Resend code in $_remainingSeconds",
+                            color: canResend
+                                ? AppColors.primaryColor
+                                : AppColors.placeholderTextColor,
                             fontSize: 12,
                           ),
                         ),
@@ -149,7 +249,11 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
               /// BOTTOM BUTTON (NOT CENTERED)
               SizedBox(
                 width: double.infinity,
-                child: PrimaryButton(text: "Verify", onClick: onVerify),
+                child: PrimaryButton(
+                  text: "Verify",
+                  onClick: onVerify,
+                  loading: loading,
+                ),
               ),
             ],
           ),

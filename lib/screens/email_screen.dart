@@ -26,30 +26,48 @@ class _EmailScreenState extends State<EmailScreen> {
 
   void onContinue() async {
     if (!_formKey.currentState!.validate()) return;
+
     setState(() {
       loading = true;
     });
-    final response = await authApi.sendOtp(email: emailController.text.trim());
 
-    if (response.statusCode == 200) {
-      await Navigator.pushNamed(
-        context,
-        "/email-verification",
-        arguments: emailController.text.trim(),
+    try {
+      final response = await authApi.sendOtp(
+        email: emailController.text.trim(),
       );
-    } else {
+
+      if (response.success) {
+        await Navigator.pushNamed(
+          context,
+          "/email-verification",
+          arguments: emailController.text.trim(),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: AppText(
+              response.data['message'] ?? "an error occured",
+              color: AppColors.placeholderTextColor,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: AppText(
-            response.data["message"],
+            "Something went wrong. Please try again.",
             color: AppColors.placeholderTextColor,
           ),
         ),
       );
+    } finally {
+      if (mounted) {
+        setState(() {
+          loading = false;
+        });
+      }
     }
-    setState(() {
-      loading = false;
-    });
   }
 
   @override
@@ -57,7 +75,7 @@ class _EmailScreenState extends State<EmailScreen> {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(32, 32, 32, 0),
+          padding: const EdgeInsets.fromLTRB(32, 32, 32, 16),
           child: Column(
             children: [
               Expanded(
