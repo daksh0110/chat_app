@@ -74,13 +74,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (!mounted) return;
 
       final response = await authApi.register(payload);
-      print(response);
-      if (response.statusCode == 200) {
-        secureStorage.setData(
-          key: "accessToken",
-          name: response.data["message"],
-        );
-        Navigator.pushReplacementNamed(context, "/homepage");
+      if (response.success == true) {
+        final data = response.data;
+        if (data != null) {
+          secureStorage.setData(
+            key: "accessToken",
+            name: data.accessToken ?? "",
+          );
+          secureStorage.setData(
+            key: "refreshToken",
+            name: data.refreshToken ?? "",
+          );
+          secureStorage.setData(key: "deviceId", name: data.deviceId ?? "");
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            "/homepage",
+            (route) => false,
+          );
+        }
       }
     } catch (e) {
       if (!mounted) return;

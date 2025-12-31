@@ -4,7 +4,6 @@ import 'package:chat_app/services/debounce.dart';
 import 'package:chat_app/services/user_api_service.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/widgets/app_text.dart';
-import 'package:chat_app/widgets/homescreen/chat_list_title.dart';
 import 'package:chat_app/widgets/search_screem/search_list_object.dart';
 import 'package:flutter/material.dart';
 

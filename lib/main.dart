@@ -5,8 +5,6 @@ import 'package:chat_app/screens/onboarding_screen.dart';
 import 'package:chat_app/screens/register_screen.dart';
 import 'package:chat_app/screens/search_user_screen.dart';
 import 'package:chat_app/screens/splash_screen.dart';
-import 'package:chat_app/screens/verify_screen.dart';
-import 'package:chat_app/screens/verify_success.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/utils/slide_page_route.dart';
 import 'package:flutter/material.dart';

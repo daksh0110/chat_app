@@ -11,7 +11,7 @@ class OnboardingScreen extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(32, 32, 32, 0),
+          padding: const EdgeInsets.fromLTRB(32, 32, 32, 16),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
