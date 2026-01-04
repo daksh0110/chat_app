@@ -15,7 +15,13 @@ class ChatListTile extends StatelessWidget {
     return InkWell(
       onTap: () {
         Navigator.of(context).push(
-          MaterialPageRoute<void>(builder: (context) => const ChatScreen()),
+          MaterialPageRoute<void>(
+            builder: (context) => ChatScreen(
+              isTyping: false,
+              userName: item.name,
+              avatar: item.profilePic,
+            ),
+          ),
         );
       },
 

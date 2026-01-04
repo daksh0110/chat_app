@@ -101,7 +101,7 @@ class _SearchUserScreenState extends State<SearchUserScreen> {
 
     if (searchItemsList.isEmpty) {
       return const Center(
-        child: AppText("No data found", color: AppColors.backgroundColor),
+        child: AppText("No data found", color: AppColors.primaryColor),
       );
     }
 

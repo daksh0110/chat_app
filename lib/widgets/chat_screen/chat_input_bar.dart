@@ -12,7 +12,7 @@ class ChatInputBar extends StatefulWidget {
 
 class _ChatInputBarState extends State<ChatInputBar> {
   final TextEditingController _ctrl = TextEditingController();
-
+  bool isTyping = false;
   @override
   void dispose() {
     _ctrl.dispose();
@@ -24,7 +24,21 @@ class _ChatInputBarState extends State<ChatInputBar> {
     if (text.isNotEmpty) {
       widget.onSend?.call(text);
       _ctrl.clear();
-      setState(() {});
+      setState(() {
+        isTyping = false;
+      });
+    }
+  }
+
+  void onChange() {
+    if (_ctrl.text.isEmpty) {
+      setState(() {
+        isTyping = false;
+      });
+    } else {
+      setState(() {
+        isTyping = true;
+      });
     }
   }
 
@@ -57,41 +71,51 @@ class _ChatInputBarState extends State<ChatInputBar> {
                   border: InputBorder.none,
                   hintText: 'Type here...',
                 ),
-                onChanged: (_) => setState(() {}),
-                onSubmitted: (_) => _send(),
+                onChanged: (value) => onChange(),
               ),
             ),
-
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                InkWell(
-                  borderRadius: BorderRadius.circular(20),
-                  onTap: () {},
-                  child: Padding(
-                    padding: const EdgeInsets.all(1),
-                    child: SvgPicture.asset(
-                      'assets/icons/gallary-icon.svg',
-                      width: 26,
+            isTyping
+                ? InkWell(
+                    onTap: _send,
+                    child: Container(
+                      padding: EdgeInsets.fromLTRB(8, 6, 6, 6),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryColor,
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                      child: Icon(Icons.send, color: Colors.white),
                     ),
-                  ),
-                ),
+                  )
+                : Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      InkWell(
+                        borderRadius: BorderRadius.circular(20),
+                        onTap: () {},
+                        child: Padding(
+                          padding: const EdgeInsets.all(1),
+                          child: SvgPicture.asset(
+                            'assets/icons/gallary-icon.svg',
+                            width: 26,
+                          ),
+                        ),
+                      ),
 
-                InkWell(
-                  borderRadius: BorderRadius.circular(20),
-                  onTap: () {},
-                  child: Padding(
-                    padding: const EdgeInsets.all(1),
-                    child: SvgPicture.asset(
-                      'assets/icons/emoji-icon.svg',
-                      width: 26,
-                    ),
-                  ),
-                ),
+                      InkWell(
+                        borderRadius: BorderRadius.circular(20),
+                        onTap: () {},
+                        child: Padding(
+                          padding: const EdgeInsets.all(1),
+                          child: SvgPicture.asset(
+                            'assets/icons/emoji-icon.svg',
+                            width: 26,
+                          ),
+                        ),
+                      ),
 
-                const SizedBox(width: 6),
-              ],
-            ),
+                      const SizedBox(width: 6),
+                    ],
+                  ),
           ],
         ),
       ),
