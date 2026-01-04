@@ -14,7 +14,13 @@ class SearchListObject extends StatelessWidget {
     return InkWell(
       onTap: () {
         Navigator.of(context).push(
-          MaterialPageRoute<void>(builder: (context) => const ChatScreen()),
+          MaterialPageRoute<void>(
+            builder: (context) => ChatScreen(
+              avatar: item.userMainImageUrl,
+              isTyping: false,
+              userName: item.name,
+            ),
+          ),
         );
       },
 

@@ -35,7 +35,7 @@ class AuthenticationApiServcie {
   Future<ApiResponse> sendOtp({required String email}) async {
     try {
       final response = await dio.post(
-        '/authentication/verify-user',
+        '/authentication/send-otp',
         data: {"email": email},
       );
       final json = response.data;

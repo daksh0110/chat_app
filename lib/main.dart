@@ -5,13 +5,16 @@ import 'package:chat_app/screens/onboarding_screen.dart';
 import 'package:chat_app/screens/register_screen.dart';
 import 'package:chat_app/screens/search_user_screen.dart';
 import 'package:chat_app/screens/splash_screen.dart';
+import 'package:chat_app/services/socket_client.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/utils/slide_page_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 void main() async {
   await dotenv.load(fileName: ".env");
+  await SocketClient().createSocketConnection();
   runApp(const MyApp());
 }
 

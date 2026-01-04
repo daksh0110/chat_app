@@ -2,16 +2,21 @@ import 'package:chat_app/modal/api_response.dart';
 import 'package:chat_app/modal/authentication_data.dart';
 import 'package:chat_app/modal/backend/verify_token_response.dart';
 import 'package:chat_app/modal/chat_search_item.dart';
+import 'package:chat_app/services/secure_storage.dart';
 import 'package:dio/dio.dart';
 
 class UserApiService {
   final Dio dio;
 
   const UserApiService({required this.dio});
-
   Future<List<ChatSearchItem>> getUsers(String name) async {
+    final storage = SecureStorage();
+    final token = await storage.getData(key: "accessToken");
     try {
-      final response = await dio.get("/users/search?q=$name");
+      final response = await dio.get(
+        "/users/search?q=$name",
+        options: Options(headers: {"Authorization": "Bearer $token"}),
+      );
       final List<dynamic> list = response.data["data"];
 
       return list.map((e) => ChatSearchItem.fromJson(e)).toList();
