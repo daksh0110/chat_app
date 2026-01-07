@@ -1,18 +1,61 @@
 import 'package:chat_app/modal/chat_litst_item.dart';
+import 'package:chat_app/modal/enums/auth_state.dart';
+import 'package:chat_app/providers/auth_provider.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/widgets/app_text.dart';
 import 'package:chat_app/widgets/homescreen/chat_list.dart';
+import 'package:chat_app/widgets/homescreen/group_list.dart';
 import 'package:chat_app/widgets/homescreen/homepage_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomepageScreen extends StatelessWidget {
+class HomepageScreen extends ConsumerStatefulWidget {
   const HomepageScreen({super.key});
 
   @override
+  ConsumerState<HomepageScreen> createState() {
+    return _HomepageScreenState();
+  }
+}
+
+class _HomepageScreenState extends ConsumerState<HomepageScreen> {
+  int selectedIndex = 0;
+  List<ChatListItem> chatListItems = [];
+  late PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: 0);
+    Future.microtask(() {
+      ref.read(authProvider.notifier).verifySession();
+    });
+  }
+
+  void openSearchUserScreen() {
+    Navigator.of(context).pushNamed('/search-user');
+  }
+
+  void onTabChanged(int index) {
+    setState(() {
+      selectedIndex = index;
+      _pageController.animateToPage(
+        index,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+      );
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    List<ChatListItem> chatListItems = [];
-    void openSearchUserScreen() {
-      Navigator.of(context).pushNamed('/search-user');
+    final authState = ref.watch(authProvider);
+    if (authState == AuthState.unauthenticated) {
+      Future.microtask(() {
+        Navigator.of(
+          context,
+        ).pushNamedAndRemoveUntil('/onboarding', (_) => false);
+      });
     }
 
     return Scaffold(
@@ -59,8 +102,22 @@ class HomepageScreen extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 20),
-            HomepageNavigationBar(),
-            ChatList(items: chatListItems),
+            HomepageNavigationBar(
+              selectedIndex: selectedIndex,
+              onTabChanged: onTabChanged,
+            ),
+            Expanded(
+              child: PageView(
+                controller: _pageController,
+                onPageChanged: (index) {
+                  setState(() => selectedIndex = index);
+                },
+                children: const [
+                  ChatList(items: []),
+                  GroupList(items: []),
+                ],
+              ),
+            ),
           ],
         ),
       ),
