@@ -7,17 +7,17 @@ import 'package:chat_app/widgets/popUp_modal.dart';
 import 'package:chat_app/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 
-class ChatList extends StatefulWidget {
-  const ChatList({super.key, required this.items});
+class GroupList extends StatefulWidget {
+  const GroupList({super.key, required this.items});
   final List<ChatListItem> items;
 
   @override
-  State<ChatList> createState() {
+  State<GroupList> createState() {
     return _ChatListState();
   }
 }
 
-class _ChatListState extends State<ChatList> {
+class _ChatListState extends State<GroupList> {
   void showPopup() {
     showDialog(context: context, builder: (context) => PopupModal());
   }
@@ -34,7 +34,7 @@ class _ChatListState extends State<ChatList> {
             const Image(image: AssetImage("assets/icons/message-icon-2.png")),
             const SizedBox(height: 10),
             const AppText(
-              "No chat found",
+              "No group chat found",
               color: AppColors.secondaryLightColor,
             ),
             const AppText(

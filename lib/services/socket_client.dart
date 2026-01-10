@@ -3,14 +3,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class SocketClient {
   Future<void> createSocketConnection() async {
-    final String baseUrl = dotenv.env["API_URL"] ?? '';
-
+    final String baseUrl = dotenv.env["BASE_URL"] ?? '';
     IO.Socket socket = IO.io(
       baseUrl,
-      IO.OptionBuilder()
-          .setTransports(['websocket'])
-          .disableAutoConnect()
-          .build(),
+      IO.OptionBuilder().setTransports(['websocket']).build(),
     );
     socket.onConnect((_) {
       print('✅ Connected to socket: ${socket.id}');
