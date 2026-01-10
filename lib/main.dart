@@ -10,7 +10,6 @@ import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/utils/slide_page_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 void main() async {
   await dotenv.load(fileName: ".env");

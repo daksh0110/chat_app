@@ -2,11 +2,27 @@ import 'package:chat_app/modal/chat_litst_item.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/widgets/app_text.dart';
 import 'package:chat_app/widgets/homescreen/chat_list.dart';
+import 'package:chat_app/widgets/homescreen/group_list.dart';
 import 'package:chat_app/widgets/homescreen/homepage_navigation_bar.dart';
 import 'package:flutter/material.dart';
 
-class HomepageScreen extends StatelessWidget {
+class HomepageScreen extends StatefulWidget {
   const HomepageScreen({super.key});
+
+  @override
+  State<HomepageScreen> createState() {
+    return _HomepageScreenState();
+  }
+}
+
+class _HomepageScreenState extends State<HomepageScreen> {
+  final PageController pageViewController = PageController();
+  int selectedTab = 0;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,8 +75,34 @@ class HomepageScreen extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 20),
-            HomepageNavigationBar(),
-            ChatList(items: chatListItems),
+            HomepageNavigationBar(
+              selectedTab: selectedTab,
+              onTabChanged: (index) {
+                setState(() {
+                  selectedTab = index;
+                  pageViewController.animateToPage(
+                    index,
+                    duration: const Duration(milliseconds: 180),
+                    curve: Curves.easeInOut,
+                  );
+                });
+              },
+            ),
+            Expanded(
+              child: PageView(
+                controller: pageViewController,
+
+                onPageChanged: (value) {
+                  setState(() {
+                    selectedTab = value;
+                  });
+                },
+                children: [
+                  ChatList(items: chatListItems),
+                  GroupList(items: chatListItems),
+                ],
+              ),
+            ),
           ],
         ),
       ),
