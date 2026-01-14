@@ -1,32 +1,85 @@
 import 'package:chat_app/modal/chat_litst_item.dart';
+import 'package:chat_app/provider/providers.dart';
+import 'package:chat_app/provider/socket_providers.dart';
+import 'package:chat_app/services/socket_client.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/widgets/app_text.dart';
 import 'package:chat_app/widgets/homescreen/chat_list.dart';
 import 'package:chat_app/widgets/homescreen/group_list.dart';
 import 'package:chat_app/widgets/homescreen/homepage_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomepageScreen extends StatefulWidget {
+class HomepageScreen extends ConsumerStatefulWidget {
   const HomepageScreen({super.key});
 
   @override
-  State<HomepageScreen> createState() {
+  ConsumerState<HomepageScreen> createState() {
     return _HomepageScreenState();
   }
 }
 
-class _HomepageScreenState extends State<HomepageScreen> {
+class _HomepageScreenState extends ConsumerState<HomepageScreen> {
   final PageController pageViewController = PageController();
+  late final ProviderSubscription<AuthenticatedState> _authSub;
+  late final SocketClient _socket;
+  List<ChatListItem> chatListItems = [];
+
   int selectedTab = 0;
+  bool _socketConnected = false;
 
   @override
   void initState() {
     super.initState();
+    _socket = ref.read(socketStateProvider);
+    Future.microtask(() async {
+      final result = await ref.read(verifySessionProvider.future);
+      ref.read(authStateProvider.notifier).state = result;
+    });
+
+    _authSub = ref.listenManual<AuthenticatedState>(authStateProvider, (
+      prev,
+      next,
+    ) async {
+      if (next == AuthenticatedState.authenticated && !_socketConnected) {
+        final storage = ref.read(secureStorageProvider);
+        final token = await storage.getData(key: "accessToken");
+
+        if (token == null || token.isEmpty) return;
+
+        _socketConnected = true;
+        await _socket.createSocketConnection(token);
+        _socket.invitedToRoom(
+          onInvitation: (data) {
+            setState(() {
+              chatListItems.add(
+                ChatListItem(
+                  name: data.name,
+                  profilePic: NetworkImage(data.userMainImageUrl),
+                  roomId: data.roomId,
+                ),
+              );
+            });
+          },
+        );
+      }
+
+      if (next == AuthenticatedState.unauthenticated) {
+        _socketConnected = false;
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _authSub.close();
+    pageViewController.dispose();
+    _socket.disconnect();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    List<ChatListItem> chatListItems = [];
     void openSearchUserScreen() {
       Navigator.of(context).pushNamed('/search-user');
     }

@@ -68,16 +68,14 @@ class _ChatListState extends State<ChatList> {
       );
     }
 
-    return Expanded(
-      child: Container(
-        margin: EdgeInsets.fromLTRB(0, 30, 0, 0),
-        child: ListView.separated(
-          itemCount: widget.items.length,
-          itemBuilder: (context, index) {
-            return ChatListTile(item: widget.items[index]);
-          },
-          separatorBuilder: (context, index) => const SizedBox(height: 20),
-        ),
+    return Container(
+      margin: EdgeInsets.fromLTRB(0, 30, 0, 0),
+      child: ListView.separated(
+        itemCount: widget.items.length,
+        itemBuilder: (context, index) {
+          return ChatListTile(item: widget.items[index]);
+        },
+        separatorBuilder: (context, index) => const SizedBox(height: 20),
       ),
     );
   }

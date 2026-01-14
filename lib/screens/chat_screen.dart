@@ -1,34 +1,89 @@
-import 'package:chat_app/modal/chat_litst_item.dart';
 import 'package:chat_app/modal/enums/message_direction.dart';
 import 'package:chat_app/modal/enums/message_status.dart';
 import 'package:chat_app/modal/message_item_modal.dart';
+import 'package:chat_app/provider/socket_providers.dart';
+import 'package:chat_app/services/socket_client.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/widgets/app_text.dart';
 import 'package:chat_app/widgets/chat_screen/chat_input_bar.dart';
 import 'package:chat_app/widgets/chat_screen/messages_list.dart';
 import 'package:chat_app/widgets/circle_bubble.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ChatScreen extends StatefulWidget {
+class ChatScreen extends ConsumerStatefulWidget {
   final String userName;
   final bool isTyping;
   final ImageProvider avatar;
+  final String userId;
+  final String initialRoomId;
 
   const ChatScreen({
     super.key,
     this.userName = 'John Doe',
     this.isTyping = true,
     this.avatar = const AssetImage("assets/images/1.png"),
+    required this.userId,
+    this.initialRoomId = "",
   });
 
   @override
-  State<ChatScreen> createState() => _ChatScreenState();
+  ConsumerState<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _ChatScreenState extends ConsumerState<ChatScreen> {
   final List<MessageItemModal> messages = [];
+  late final SocketClient _socket;
+  late String roomId;
+
+  @override
+  void initState() {
+    super.initState();
+    roomId = widget.initialRoomId;
+    _socket = ref.read(socketStateProvider);
+
+    _socket.recieveMessage(
+      onMessage: (from, message) => setState(() {
+        messages.insert(
+          0,
+          MessageItemModal(
+            id: DateTime.now().millisecondsSinceEpoch.toString(),
+            message: message,
+            messageBy: MessageDirection.received,
+            messageAt: DateTime.now(),
+            status: MessageStatus.delivered,
+          ),
+        );
+      }),
+    );
+
+    _socket.joinedRoom(
+      onJoining: (data) {
+        setState(() {
+          roomId = data.roomId;
+        });
+      },
+    );
+    _socket.invitedToRoom(
+      onInvitation: (data) {
+        setState(() {
+          roomId = data.roomId;
+        });
+
+        _socket.joinRoom(roomId);
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _socket.removeMessageListener();
+    super.dispose();
+  }
 
   void _handleSend(String text) {
+    final to = roomId.isNotEmpty ? roomId : widget.userId;
+    _socket.sendMessage(message: text, to: to);
     setState(() {
       messages.insert(
         0,
@@ -69,25 +124,23 @@ class _ChatScreenState extends State<ChatScreen> {
               child: CircleBubble(imageProvider: widget.avatar),
             ),
             const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  AppText(
-                    widget.userName,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textMediumColor,
-                  ),
-                  const SizedBox(height: 2),
-                  AppText(
-                    widget.isTyping ? 'typing...' : 'online',
-                    color: AppColors.placeholderTextColor,
-                    fontSize: 14,
-                  ),
-                ],
-              ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AppText(
+                  widget.userName,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textMediumColor,
+                ),
+                const SizedBox(height: 2),
+                AppText(
+                  widget.isTyping ? 'typing...' : 'online',
+                  color: AppColors.placeholderTextColor,
+                  fontSize: 14,
+                ),
+              ],
             ),
           ],
         ),

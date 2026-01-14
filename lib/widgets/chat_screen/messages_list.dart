@@ -18,15 +18,13 @@ class MessagesList extends StatefulWidget {
 class _MessageListState extends State<MessagesList> {
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: ListView.separated(
-        reverse: true,
-        itemCount: widget.mess.length,
-        itemBuilder: (context, index) {
-          return MessageItem(message: widget.mess[index]);
-        },
-        separatorBuilder: (context, index) => const SizedBox(height: 20),
-      ),
+    return ListView.separated(
+      reverse: true,
+      itemCount: widget.mess.length,
+      itemBuilder: (context, index) {
+        return MessageItem(message: widget.mess[index]);
+      },
+      separatorBuilder: (context, index) => const SizedBox(height: 20),
     );
   }
 }
