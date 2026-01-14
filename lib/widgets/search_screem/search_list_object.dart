@@ -19,6 +19,7 @@ class SearchListObject extends StatelessWidget {
               avatar: item.userMainImageUrl,
               isTyping: false,
               userName: item.name,
+              userId: item.id,
             ),
           ),
         );
@@ -36,37 +37,28 @@ class SearchListObject extends StatelessWidget {
             ),
             const SizedBox(width: 10),
 
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: AppText(
-                          item.name,
-                          color: AppColors.textMediumColor,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    AppText(
+                      item.name,
+                      color: AppColors.textMediumColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ],
+                ),
 
-                  const SizedBox(height: 5),
+                const SizedBox(height: 5),
 
-                  Row(
-                    children: [
-                      Expanded(
-                        child: AppText(
-                          item.email,
-                          color: AppColors.placeholderTextColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                Row(
+                  children: [
+                    AppText(item.email, color: AppColors.placeholderTextColor),
+                  ],
+                ),
+              ],
             ),
           ],
         ),

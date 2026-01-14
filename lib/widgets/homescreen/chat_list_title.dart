@@ -20,6 +20,8 @@ class ChatListTile extends StatelessWidget {
               isTyping: false,
               userName: item.name,
               avatar: item.profilePic,
+              userId: "1",
+              initialRoomId: item.roomId,
             ),
           ),
         );

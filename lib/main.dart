@@ -5,24 +5,23 @@ import 'package:chat_app/screens/onboarding_screen.dart';
 import 'package:chat_app/screens/register_screen.dart';
 import 'package:chat_app/screens/search_user_screen.dart';
 import 'package:chat_app/screens/splash_screen.dart';
-import 'package:chat_app/services/socket_client.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/utils/slide_page_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");
-  await SocketClient().createSocketConnection();
-  runApp(const MyApp());
+  runApp(ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',

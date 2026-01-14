@@ -6,6 +6,7 @@ class ChatListItem {
   final ImageProvider profilePic;
   final int newMessageCount;
   final DateTime? lastMessageAt;
+  final String roomId;
 
   ChatListItem({
     required this.name,
@@ -13,5 +14,6 @@ class ChatListItem {
     this.profilePic = const AssetImage("assets/images/1.png"),
     this.newMessageCount = 0,
     this.lastMessageAt,
+    this.roomId = "",
   });
 }
