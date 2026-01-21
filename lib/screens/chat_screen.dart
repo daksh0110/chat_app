@@ -1,7 +1,11 @@
 import 'package:chat_app/modal/enums/message_direction.dart';
 import 'package:chat_app/modal/enums/message_status.dart';
 import 'package:chat_app/modal/message_item_modal.dart';
+import 'package:chat_app/provider/providers.dart';
 import 'package:chat_app/provider/socket_providers.dart';
+import 'package:chat_app/services/add_message.dart';
+import 'package:chat_app/services/assignRoomId.dart';
+import 'package:chat_app/services/reset_count.dart';
 import 'package:chat_app/services/socket_client.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/widgets/app_text.dart';
@@ -32,7 +36,6 @@ class ChatScreen extends ConsumerStatefulWidget {
 }
 
 class _ChatScreenState extends ConsumerState<ChatScreen> {
-  final List<MessageItemModal> messages = [];
   late final SocketClient _socket;
   late String roomId;
 
@@ -41,20 +44,35 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     super.initState();
     roomId = widget.initialRoomId;
     _socket = ref.read(socketStateProvider);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      resetUnreadCount(ref, roomId);
+    });
+
+    _socket.roomCreated(
+      onRoomCreated: (roomId, userId) {
+        print("reached here $roomId");
+        assignRoomId(ref, roomId, userId);
+
+        _socket.joinRoom(roomId);
+
+        setState(() {
+          this.roomId = roomId;
+        });
+      },
+    );
 
     _socket.recieveMessage(
-      onMessage: (from, message) => setState(() {
-        messages.insert(
-          0,
-          MessageItemModal(
-            id: DateTime.now().millisecondsSinceEpoch.toString(),
-            message: message,
-            messageBy: MessageDirection.received,
-            messageAt: DateTime.now(),
-            status: MessageStatus.delivered,
-          ),
-        );
-      }),
+      onMessage: (from, message, messageSentAt) => addMessage(
+        ref,
+        roomId,
+        MessageItemModal(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          message: message,
+          messageBy: MessageDirection.received,
+          messageAt: messageSentAt,
+          status: MessageStatus.delivered,
+        ),
+      ),
     );
 
     _socket.joinedRoom(
@@ -83,23 +101,25 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   void _handleSend(String text) {
     final to = roomId.isNotEmpty ? roomId : widget.userId;
+    print("this is the to$to");
     _socket.sendMessage(message: text, to: to);
-    setState(() {
-      messages.insert(
-        0,
-        MessageItemModal(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          message: text,
-          messageAt: DateTime.now(),
-          messageBy: MessageDirection.sent,
-          status: MessageStatus.sent,
-        ),
-      );
-    });
+
+    addMessage(
+      ref,
+      roomId,
+      MessageItemModal(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        message: text,
+        messageAt: DateTime.now(),
+        messageBy: MessageDirection.sent,
+        status: MessageStatus.sent,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final messages = ref.watch(messagesProvider)[roomId] ?? [];
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(

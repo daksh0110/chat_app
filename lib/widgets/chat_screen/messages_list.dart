@@ -22,7 +22,8 @@ class _MessageListState extends State<MessagesList> {
       reverse: true,
       itemCount: widget.mess.length,
       itemBuilder: (context, index) {
-        return MessageItem(message: widget.mess[index]);
+        final message = widget.mess[widget.mess.length - 1 - index];
+        return MessageItem(message: message);
       },
       separatorBuilder: (context, index) => const SizedBox(height: 20),
     );

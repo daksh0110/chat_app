@@ -44,12 +44,16 @@ class SocketClient {
   }
 
   void recieveMessage({
-    required void Function(String from, String message) onMessage,
+    required void Function(String from, String message, DateTime messageSentAt)
+    onMessage,
   }) {
     socket?.on("receive_private_message", (data) {
       final String from = data["from"];
       final String message = data["message"];
-      onMessage(from, message);
+      final DateTime messageSentAt = DateTime.fromMillisecondsSinceEpoch(
+        data["messageSentAt"] as int,
+      );
+      onMessage(from, message, messageSentAt);
     });
   }
 
@@ -71,10 +75,11 @@ class SocketClient {
     required Function(SocketInvitedToRoom data) onInvitation,
   }) {
     socket?.on("invited_to_room", (data) {
+      print("reachedheer $data");
       final invitation = SocketInvitedToRoom.fromJson(
         Map<String, dynamic>.from(data),
       );
-
+      socket?.emit("join_room", {"roomId": invitation.roomId});
       onInvitation(invitation);
     });
   }
@@ -90,5 +95,15 @@ class SocketClient {
 
   void joinRoom(String roomId) {
     socket?.emit("join_room", {"roomId": roomId});
+  }
+
+  void roomCreated({
+    required Function(String roomId, String userId) onRoomCreated,
+  }) {
+    socket?.on("room-created", (data) {
+      final roomId = data["roomId"] as String;
+      final userId = data["userId"] as String;
+      onRoomCreated(roomId, userId);
+    });
   }
 }

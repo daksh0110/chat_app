@@ -1,7 +1,11 @@
 import 'package:chat_app/modal/chat_litst_item.dart';
+import 'package:chat_app/modal/enums/message_direction.dart';
+import 'package:chat_app/modal/enums/message_status.dart';
+import 'package:chat_app/modal/message_item_modal.dart';
 import 'package:chat_app/provider/providers.dart';
 import 'package:chat_app/provider/socket_providers.dart';
 import 'package:chat_app/services/socket_client.dart';
+import 'package:chat_app/services/update-chat-item.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/widgets/app_text.dart';
 import 'package:chat_app/widgets/homescreen/chat_list.dart';
@@ -23,8 +27,6 @@ class _HomepageScreenState extends ConsumerState<HomepageScreen> {
   final PageController pageViewController = PageController();
   late final ProviderSubscription<AuthenticatedState> _authSub;
   late final SocketClient _socket;
-  List<ChatListItem> chatListItems = [];
-
   int selectedTab = 0;
   bool _socketConnected = false;
 
@@ -51,15 +53,23 @@ class _HomepageScreenState extends ConsumerState<HomepageScreen> {
         await _socket.createSocketConnection(token);
         _socket.invitedToRoom(
           onInvitation: (data) {
-            setState(() {
-              chatListItems.add(
-                ChatListItem(
-                  name: data.name,
-                  profilePic: NetworkImage(data.userMainImageUrl),
-                  roomId: data.roomId,
+            final chatItem = ChatListItem.fromSocket(data);
+            final currentMessages = ref.read(messagesProvider);
+            ref.read(messagesProvider.notifier).state = {
+              ...currentMessages,
+              data.roomId: [
+                ...(currentMessages[data.roomId] ?? []),
+                MessageItemModal(
+                  id: "",
+                  message: data.message ?? "",
+                  messageBy: MessageDirection.received,
+                  messageAt: data.messageSentAt,
+                  status: MessageStatus.delivered,
                 ),
-              );
-            });
+              ],
+            };
+
+            updateChatInfo(ref, chatItem);
           },
         );
       }
@@ -83,6 +93,8 @@ class _HomepageScreenState extends ConsumerState<HomepageScreen> {
     void openSearchUserScreen() {
       Navigator.of(context).pushNamed('/search-user');
     }
+
+    final chatListItems = ref.watch(chatListProvider);
 
     return Scaffold(
       floatingActionButton: Transform.translate(
