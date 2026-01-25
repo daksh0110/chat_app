@@ -1,4 +1,3 @@
-import 'package:chat_app/modal/enums/message_direction.dart';
 import 'package:chat_app/modal/message_item_modal.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/widgets/app_text.dart';
