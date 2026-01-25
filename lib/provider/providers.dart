@@ -1,5 +1,5 @@
 import 'package:chat_app/modal/authentication_data.dart';
-import 'package:chat_app/modal/chat_litst_item.dart';
+import 'package:chat_app/modal/chat_list_item.dart';
 import 'package:chat_app/modal/message_item_modal.dart';
 import 'package:chat_app/services/api_client.dart';
 import 'package:chat_app/services/secure_storage.dart';
@@ -52,8 +52,3 @@ final verifySessionProvider = FutureProvider<AuthenticatedState>((ref) async {
     return AuthenticatedState.unauthenticated;
   }
 });
-
-final chatListProvider = StateProvider<List<ChatListItem>>((ref) => []);
-final messagesProvider = StateProvider<Map<String, List<MessageItemModal>>>(
-  (ref) => {},
-);

@@ -1,6 +1,6 @@
 import 'package:chat_app/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:chat_app/modal/chat_litst_item.dart';
+import 'package:chat_app/modal/chat_list_item.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/utils/message_time.dart';
 import 'package:chat_app/widgets/app_text.dart';
@@ -8,6 +8,7 @@ import 'package:chat_app/widgets/circle_bubble.dart';
 
 class ChatListTile extends StatelessWidget {
   const ChatListTile({super.key, required this.item});
+
   final ChatListItem item;
 
   @override
@@ -19,9 +20,8 @@ class ChatListTile extends StatelessWidget {
             builder: (context) => ChatScreen(
               isTyping: false,
               userName: item.name,
-              avatar: item.profilePic,
-              userId: "1",
-              initialRoomId: item.roomId,
+              avatar: item.profilePic ?? "",
+              userId: item.id,
             ),
           ),
         );
@@ -35,7 +35,7 @@ class ChatListTile extends StatelessWidget {
             SizedBox(
               width: 50,
               height: 50,
-              child: CircleBubble(imageProvider: item.profilePic),
+              child: CircleBubble(imageProvider: NetworkImage(item.profilePic)),
             ),
             const SizedBox(width: 10),
 

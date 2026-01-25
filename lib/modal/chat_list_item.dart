@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class ChatListItem {
   final String name;
   final String message;
-  final ImageProvider profilePic;
+  final String profilePic;
   final int newMessageCount;
   final DateTime? lastMessageAt;
   final String roomId;
@@ -14,12 +14,13 @@ class ChatListItem {
   ChatListItem({
     required this.name,
     this.message = "",
-    this.profilePic = const AssetImage("assets/images/1.png"),
+    this.profilePic = "",
     this.newMessageCount = 0,
     this.lastMessageAt,
     this.roomId = "",
     required this.id,
   });
+
   factory ChatListItem.fromSocket(SocketInvitedToRoom data) {
     return ChatListItem(
       id: data.from,
@@ -57,15 +58,22 @@ class ChatListItem {
     );
   }
 
-  ChatListItem updateInfo(ChatListItem? data) {
+  ChatListItem copyWith({
+    String? name,
+    String? message,
+    DateTime? lastMessageAt,
+    int? newMessageCount,
+    String? profilePic,
+    String? roomId,
+  }) {
     return ChatListItem(
-      name: data?.name ?? name,
-      id: data?.id ?? id,
-      lastMessageAt: data?.lastMessageAt ?? lastMessageAt,
-      message: data?.message ?? message,
-      newMessageCount: newMessageCount + 1,
-      profilePic: data?.profilePic ?? profilePic,
-      roomId: data?.roomId ?? roomId,
+      name: name ?? this.name,
+      id: id,
+      message: message ?? this.message,
+      lastMessageAt: lastMessageAt ?? this.lastMessageAt,
+      newMessageCount: newMessageCount ?? this.newMessageCount,
+      profilePic: profilePic ?? this.profilePic,
+      roomId: roomId ?? this.roomId,
     );
   }
 }

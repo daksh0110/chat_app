@@ -1,11 +1,9 @@
-import 'package:chat_app/modal/chat_litst_item.dart';
-import 'package:chat_app/modal/enums/message_direction.dart';
-import 'package:chat_app/modal/enums/message_status.dart';
+import 'package:chat_app/modal/chat_list_item.dart';
 import 'package:chat_app/modal/message_item_modal.dart';
+import 'package:chat_app/provider/messages/chat_list_provider.dart';
 import 'package:chat_app/provider/providers.dart';
 import 'package:chat_app/provider/socket_providers.dart';
 import 'package:chat_app/services/socket_client.dart';
-import 'package:chat_app/services/update-chat-item.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/widgets/app_text.dart';
 import 'package:chat_app/widgets/homescreen/chat_list.dart';
@@ -25,64 +23,16 @@ class HomepageScreen extends ConsumerStatefulWidget {
 
 class _HomepageScreenState extends ConsumerState<HomepageScreen> {
   final PageController pageViewController = PageController();
-  late final ProviderSubscription<AuthenticatedState> _authSub;
   late final SocketClient _socket;
   int selectedTab = 0;
-  bool _socketConnected = false;
 
   @override
   void initState() {
     super.initState();
-    _socket = ref.read(socketStateProvider);
-    Future.microtask(() async {
-      final result = await ref.read(verifySessionProvider.future);
-      ref.read(authStateProvider.notifier).state = result;
-    });
-
-    _authSub = ref.listenManual<AuthenticatedState>(authStateProvider, (
-      prev,
-      next,
-    ) async {
-      if (next == AuthenticatedState.authenticated && !_socketConnected) {
-        final storage = ref.read(secureStorageProvider);
-        final token = await storage.getData(key: "accessToken");
-
-        if (token == null || token.isEmpty) return;
-
-        _socketConnected = true;
-        await _socket.createSocketConnection(token);
-        _socket.invitedToRoom(
-          onInvitation: (data) {
-            final chatItem = ChatListItem.fromSocket(data);
-            final currentMessages = ref.read(messagesProvider);
-            ref.read(messagesProvider.notifier).state = {
-              ...currentMessages,
-              data.roomId: [
-                ...(currentMessages[data.roomId] ?? []),
-                MessageItemModal(
-                  id: "",
-                  message: data.message ?? "",
-                  messageBy: MessageDirection.received,
-                  messageAt: data.messageSentAt,
-                  status: MessageStatus.delivered,
-                ),
-              ],
-            };
-
-            updateChatInfo(ref, chatItem);
-          },
-        );
-      }
-
-      if (next == AuthenticatedState.unauthenticated) {
-        _socketConnected = false;
-      }
-    });
   }
 
   @override
   void dispose() {
-    _authSub.close();
     pageViewController.dispose();
     _socket.disconnect();
     super.dispose();
