@@ -1,4 +1,4 @@
-import 'package:chat_app/modal/chat_litst_item.dart';
+import 'package:chat_app/modal/chat_list_item.dart';
 import 'package:chat_app/screens/import_address_screem.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/widgets/app_text.dart';
@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 
 class GroupList extends StatefulWidget {
   const GroupList({super.key, required this.items});
+
   final List<ChatListItem> items;
 
   @override
@@ -68,16 +69,14 @@ class _ChatListState extends State<GroupList> {
       );
     }
 
-    return Expanded(
-      child: Container(
-        margin: EdgeInsets.fromLTRB(0, 30, 0, 0),
-        child: ListView.separated(
-          itemCount: widget.items.length,
-          itemBuilder: (context, index) {
-            return ChatListTile(item: widget.items[index]);
-          },
-          separatorBuilder: (context, index) => const SizedBox(height: 20),
-        ),
+    return Container(
+      margin: EdgeInsets.fromLTRB(0, 30, 0, 0),
+      child: ListView.separated(
+        itemCount: widget.items.length,
+        itemBuilder: (context, index) {
+          return ChatListTile(item: widget.items[index]);
+        },
+        separatorBuilder: (context, index) => const SizedBox(height: 20),
       ),
     );
   }

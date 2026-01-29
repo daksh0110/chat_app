@@ -1,22 +1,30 @@
 class SocketInvitedToRoom {
   final String roomId;
-  final String id;
-  final String email;
+  final String from;
   final String name;
-  final String userMainImageUrl;
+  final String? profilePic;
+  final DateTime messageSentAt;
+  final String? message;
 
   const SocketInvitedToRoom({
     required this.roomId,
-    required this.id,
-    required this.email,
+    required this.from,
     required this.name,
-    required this.userMainImageUrl,
+    this.profilePic,
+    required this.messageSentAt,
+    this.message,
   });
 
-  SocketInvitedToRoom.fromJson(Map<String, dynamic> json)
-    : roomId = json["roomId"],
-      id = json["id"],
-      email = json["email"],
-      name = json["name"],
-      userMainImageUrl = json["userMainImageUrl"];
+  factory SocketInvitedToRoom.fromJson(Map<String, dynamic> json) {
+    return SocketInvitedToRoom(
+      roomId: json["roomId"] as String,
+      from: json["from"] as String,
+      name: json["name"] as String,
+      messageSentAt: DateTime.fromMillisecondsSinceEpoch(
+        json["messageSentAt"] as int,
+      ),
+      message: json["message"] as String?,
+      profilePic: json["profilePic"] as String?,
+    );
+  }
 }

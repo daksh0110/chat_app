@@ -1,4 +1,6 @@
 import 'package:chat_app/modal/authentication_data.dart';
+import 'package:chat_app/modal/chat_list_item.dart';
+import 'package:chat_app/modal/message_item_modal.dart';
 import 'package:chat_app/services/api_client.dart';
 import 'package:chat_app/services/secure_storage.dart';
 import 'package:chat_app/services/socket_client.dart';

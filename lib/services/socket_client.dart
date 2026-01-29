@@ -35,21 +35,33 @@ class SocketClient {
     });
   }
 
-  void sendMessage({required String to, required String message}) {
+  void sendMessage({
+    required String receiver,
+    required String message,
+    String? roomId,
+  }) {
     if (socket == null || socket!.connected != true) {
       return;
     }
 
-    socket!.emit('private_message', {'to': to, 'message': message});
+    socket!.emit('send_private_message', {
+      'receiver': receiver,
+      'message': message,
+      'roomId': roomId,
+    });
   }
 
   void recieveMessage({
-    required void Function(String from, String message) onMessage,
+    required void Function(String from, String message, DateTime messageSentAt)
+    onMessage,
   }) {
     socket?.on("receive_private_message", (data) {
-      final String from = data["from"];
+      final String from = data["receiver"];
       final String message = data["message"];
-      onMessage(from, message);
+      final DateTime messageSentAt = DateTime.fromMillisecondsSinceEpoch(
+        data["messageSentAt"] as int,
+      );
+      onMessage(from, message, messageSentAt);
     });
   }
 
@@ -74,21 +86,17 @@ class SocketClient {
       final invitation = SocketInvitedToRoom.fromJson(
         Map<String, dynamic>.from(data),
       );
-
       onInvitation(invitation);
     });
   }
 
-  void joinedRoom({required Function(SocketJoinedRoom data) onJoining}) {
-    socket?.on("joined_room", (data) {
-      final acknowledgement = SocketJoinedRoom.fromJson(
-        Map<String, dynamic>.from(data),
-      );
-      onJoining(acknowledgement);
+  void roomCreated({
+    required Function(String roomId, String userId) onRoomCreated,
+  }) {
+    socket?.on("room-created", (data) {
+      final roomId = data["roomId"] as String;
+      final userId = data["userId"] as String;
+      onRoomCreated(roomId, userId);
     });
-  }
-
-  void joinRoom(String roomId) {
-    socket?.emit("join_room", {"roomId": roomId});
   }
 }

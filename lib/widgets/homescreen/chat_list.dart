@@ -1,4 +1,4 @@
-import 'package:chat_app/modal/chat_litst_item.dart';
+import 'package:chat_app/modal/chat_list_item.dart';
 import 'package:chat_app/screens/import_address_screem.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/widgets/app_text.dart';
@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 
 class ChatList extends StatefulWidget {
   const ChatList({super.key, required this.items});
+
   final List<ChatListItem> items;
 
   @override

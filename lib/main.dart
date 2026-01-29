@@ -1,3 +1,5 @@
+import 'package:chat_app/provider/providers.dart';
+import 'package:chat_app/provider/socket_providers.dart';
 import 'package:chat_app/screens/email_screen.dart';
 import 'package:chat_app/screens/email_verification.dart';
 import 'package:chat_app/screens/homepage_screen.dart';
@@ -22,6 +24,23 @@ class MyApp extends ConsumerWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen<AuthenticatedState>(authStateProvider, (previous, next) async {
+      final socketNotifier = ref.read(socketStateProvider.notifier);
+
+      if (next == AuthenticatedState.authenticated) {
+        final token = await ref
+            .read(secureStorageProvider)
+            .getData(key: 'accessToken');
+
+        if (token != null) {
+          await socketNotifier.connect(token);
+        }
+      } else {
+        socketNotifier.disconnect();
+      }
+    });
+    ref.watch(socketStateProvider);
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',

@@ -1,5 +1,6 @@
-import 'package:chat_app/modal/enums/message_direction.dart';
-import 'package:chat_app/modal/enums/message_status.dart';
+enum MessageDirection { sent, received }
+
+enum MessageStatus { sending, sent, delivered, read, failed }
 
 class MessageItemModal {
   final String id;
@@ -15,4 +16,14 @@ class MessageItemModal {
     required this.messageAt,
     required this.status,
   });
+
+  MessageItemModal changeStatus(MessageStatus status) {
+    return MessageItemModal(
+      id: id,
+      message: message,
+      messageBy: messageBy,
+      messageAt: messageAt,
+      status: status,
+    );
+  }
 }

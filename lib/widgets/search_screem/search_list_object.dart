@@ -7,6 +7,7 @@ import 'package:chat_app/widgets/circle_bubble.dart';
 
 class SearchListObject extends StatelessWidget {
   const SearchListObject({super.key, required this.item});
+
   final ChatSearchItem item;
 
   @override
@@ -16,7 +17,7 @@ class SearchListObject extends StatelessWidget {
         Navigator.of(context).push(
           MaterialPageRoute<void>(
             builder: (context) => ChatScreen(
-              avatar: item.userMainImageUrl,
+              avatar: item.userMainImageUrl ?? "",
               isTyping: false,
               userName: item.name,
               userId: item.id,
@@ -33,7 +34,9 @@ class SearchListObject extends StatelessWidget {
             SizedBox(
               width: 50,
               height: 50,
-              child: CircleBubble(imageProvider: item.userMainImageUrl),
+              child: CircleBubble(
+                imageProvider: NetworkImage(item.userMainImageUrl),
+              ),
             ),
             const SizedBox(width: 10),
 

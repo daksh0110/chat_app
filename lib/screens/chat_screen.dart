@@ -1,6 +1,7 @@
-import 'package:chat_app/modal/enums/message_direction.dart';
-import 'package:chat_app/modal/enums/message_status.dart';
-import 'package:chat_app/modal/message_item_modal.dart';
+import 'package:chat_app/modal/chat_list_item.dart';
+import 'package:chat_app/provider/messages/chat_list_provider.dart';
+import 'package:chat_app/provider/messages/messages_notifier.dart';
+import 'package:chat_app/provider/providers.dart';
 import 'package:chat_app/provider/socket_providers.dart';
 import 'package:chat_app/services/socket_client.dart';
 import 'package:chat_app/theme/app_colors.dart';
@@ -14,17 +15,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class ChatScreen extends ConsumerStatefulWidget {
   final String userName;
   final bool isTyping;
-  final ImageProvider avatar;
+  final String avatar;
   final String userId;
-  final String initialRoomId;
 
   const ChatScreen({
     super.key,
     this.userName = 'John Doe',
     this.isTyping = true,
-    this.avatar = const AssetImage("assets/images/1.png"),
+    this.avatar = "",
     required this.userId,
-    this.initialRoomId = "",
   });
 
   @override
@@ -32,47 +31,16 @@ class ChatScreen extends ConsumerStatefulWidget {
 }
 
 class _ChatScreenState extends ConsumerState<ChatScreen> {
-  final List<MessageItemModal> messages = [];
   late final SocketClient _socket;
-  late String roomId;
 
   @override
   void initState() {
     super.initState();
-    roomId = widget.initialRoomId;
-    _socket = ref.read(socketStateProvider);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(chatListProvider.notifier).resetUnreadCount(widget.userId);
 
-    _socket.recieveMessage(
-      onMessage: (from, message) => setState(() {
-        messages.insert(
-          0,
-          MessageItemModal(
-            id: DateTime.now().millisecondsSinceEpoch.toString(),
-            message: message,
-            messageBy: MessageDirection.received,
-            messageAt: DateTime.now(),
-            status: MessageStatus.delivered,
-          ),
-        );
-      }),
-    );
-
-    _socket.joinedRoom(
-      onJoining: (data) {
-        setState(() {
-          roomId = data.roomId;
-        });
-      },
-    );
-    _socket.invitedToRoom(
-      onInvitation: (data) {
-        setState(() {
-          roomId = data.roomId;
-        });
-
-        _socket.joinRoom(roomId);
-      },
-    );
+      ref.read(messagesProvider.notifier).markMessagesAsRead(widget.userId);
+    });
   }
 
   @override
@@ -82,24 +50,29 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   void _handleSend(String text) {
-    final to = roomId.isNotEmpty ? roomId : widget.userId;
-    _socket.sendMessage(message: text, to: to);
-    setState(() {
-      messages.insert(
-        0,
-        MessageItemModal(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          message: text,
-          messageAt: DateTime.now(),
-          messageBy: MessageDirection.sent,
-          status: MessageStatus.sent,
-        ),
-      );
-    });
+    ref
+        .read(socketStateProvider.notifier)
+        .sendMessage(receiver: widget.userId, message: text);
+    ref
+        .read(chatListProvider.notifier)
+        .addItem(
+          ChatListItem(
+            name: widget.userName,
+            id: widget.userId,
+            message: "you: $text",
+            profilePic: widget.avatar,
+          ),
+        );
+
+    ref
+        .read(chatListProvider.notifier)
+        .updateLastMessageInfo(userId: widget.userId, message: text);
   }
 
   @override
   Widget build(BuildContext context) {
+    final messages = ref.watch(messagesProvider)[widget.userId] ?? [];
+
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
@@ -121,8 +94,13 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
             SizedBox(
               height: 48,
               width: 48,
-              child: CircleBubble(imageProvider: widget.avatar),
+              child: CircleBubble(
+                imageProvider: widget.avatar.isNotEmpty
+                    ? NetworkImage(widget.avatar)
+                    : const AssetImage("assets/images/1.png"),
+              ),
             ),
+
             const SizedBox(width: 12),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
