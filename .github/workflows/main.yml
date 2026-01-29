@@ -1,0 +1,38 @@
+name: Build & Release (Testing)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build Flutter APK
+    runs-on: macos-latest
+
+    steps:
+      # Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Setup Flutter
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.19.0"
+          channel: stable
+
+      # Install dependencies
+      - name: Flutter pub get
+        run: flutter pub get
+
+      # Build release APK (debug-signed, OK for testing)
+      - name: Build release APK
+        run: flutter build apk --release
+
+      # Upload APK as artifact
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
