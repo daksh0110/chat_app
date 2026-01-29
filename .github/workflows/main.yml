@@ -11,32 +11,54 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      # Checkout code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Setup Flutter
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: stable
 
-      # Create .env from secret
       - name: Create env file
-        run: |
-          echo "${{ secrets.chat_app }}" > .env
+        run: echo "${{ secrets.chat_app }}" > .env
 
-      # Install dependencies
       - name: Flutter pub get
         run: flutter pub get
 
-      # Build release APK
+      - name: Bump versionCode
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
+          NAME=${VERSION%%+*}
+          CODE=${VERSION##*+}
+          NEW_CODE=$((CODE+1))
+          sed -i '' "s/version: .*/version: $NAME+$NEW_CODE/" pubspec.yaml
+          echo "Updated version to $NAME+$NEW_CODE"
+
       - name: Build release APK
         run: flutter build apk --release
 
-      # Upload APK as artifact
-      - name: Upload APK
+      - name: Rename APK
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
+          mv build/app/outputs/flutter-apk/app-release.apk \
+             build/app/outputs/flutter-apk/app-release-$VERSION.apk
+
+      - name: Decode Firebase credentials
+        run: echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 --decode > firebase.json
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Upload APK to Firebase Storage
+        run: |
+          export GOOGLE_APPLICATION_CREDENTIALS=firebase.json
+          firebase storage:upload \
+            build/app/outputs/flutter-apk/*.apk \
+            apks/app-release.apk \
+            --force
+
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: flutter-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: build/app/outputs/flutter-apk/*.apk
