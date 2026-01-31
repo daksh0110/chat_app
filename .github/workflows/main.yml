@@ -39,17 +39,12 @@ jobs:
           mv build/app/outputs/flutter-apk/app-release.apk \
              build/app/outputs/flutter-apk/app-release-$VERSION.apk
 
-      # ✅ FIXED: Install AWS CLI v2 properly for Ubuntu 24.04
-      - name: Install AWS CLI v2 and jq
+      # ✅ AWS CLI already exists on ubuntu-latest
+      - name: Verify AWS CLI and install jq
         run: |
-          sudo apt-get update
-          sudo apt-get install -y jq unzip curl
-
-          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-          unzip awscliv2.zip
-          sudo ./aws/install
-
           aws --version
+          sudo apt-get update
+          sudo apt-get install -y jq
 
       - name: Upload APK to Cloudflare R2
         env:
