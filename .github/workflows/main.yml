@@ -46,19 +46,23 @@ jobs:
       - name: Decode Firebase credentials
         run: echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 --decode > firebase.json
 
-      - name: Install Firebase CLI
-        run: npm install -g firebase-tools
-
-      - name: Upload APK to Firebase Storage
+      - name: Install Google Cloud SDK
         run: |
-          export GOOGLE_APPLICATION_CREDENTIALS=firebase.json
-          firebase storage:upload \
-            build/app/outputs/flutter-apk/*.apk \
-            apks/app-release.apk \
-            --force
+          curl https://sdk.cloud.google.com | bash
+          source "$HOME/google-cloud-sdk/path.bash.inc"
+           gcloud components install gsutil
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: flutter-apk
           path: build/app/outputs/flutter-apk/*.apk
+      - name: Upload APK to Google Cloud Storage
+        run: |
+          export GOOGLE_APPLICATION_CREDENTIALS=firebase.json
+
+          PROJECT_ID=$(jq -r '.project_id' firebase.json)
+
+          gsutil cp \
+            build/app/outputs/flutter-apk/*.apk \
+            gs://$PROJECT_ID.appspot.com/apks/
