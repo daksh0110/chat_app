@@ -53,15 +53,17 @@ jobs:
           AWS_DEFAULT_REGION: auto
         run: |
           set -e
+
+          echo "Listing APK directory:"
+          ls -lh build/app/outputs/flutter-apk
+
+          APK_PATH=$(ls build/app/outputs/flutter-apk/*.apk)
+
+          echo "Uploading $APK_PATH"
+
           aws configure set default.s3.signature_version s3v4
 
           aws s3 cp \
-            build/app/outputs/flutter-apk/*.apk \
+            "$APK_PATH" \
             "s3://${{ secrets.R2_BUCKET_NAME }}/" \
             --endpoint-url "https://${{ secrets.CF_ACCOUNT_ID }}.r2.cloudflarestorage.com"
-
-      - name: Upload APK artifact (backup)
-        uses: actions/upload-artifact@v4
-        with:
-          name: flutter-apk
-          path: build/app/outputs/flutter-apk/*.apk
