@@ -27,8 +27,8 @@ jobs:
       - name: Flutter pub get
         run: flutter pub get
 
-      # ✅ NO version increment
-      # pubspec.yaml is source of truth
+      # ❌ NO version increment
+      # pubspec.yaml is the source of truth
 
       - name: Build release APK
         run: flutter build apk --release
@@ -39,10 +39,17 @@ jobs:
           mv build/app/outputs/flutter-apk/app-release.apk \
              build/app/outputs/flutter-apk/app-release-$VERSION.apk
 
-      - name: Install AWS CLI and jq
+      # ✅ FIXED: Install AWS CLI v2 properly for Ubuntu 24.04
+      - name: Install AWS CLI v2 and jq
         run: |
           sudo apt-get update
-          sudo apt-get install -y awscli jq
+          sudo apt-get install -y jq unzip curl
+
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install
+
+          aws --version
 
       - name: Upload APK to Cloudflare R2
         env:
