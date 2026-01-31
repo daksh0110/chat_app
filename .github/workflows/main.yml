@@ -27,7 +27,8 @@ jobs:
       - name: Flutter pub get
         run: flutter pub get
 
-      # ❌ No version increment — pubspec.yaml is source of truth
+      # ✅ NO version increment
+      # pubspec.yaml is source of truth
 
       - name: Build release APK
         run: flutter build apk --release
@@ -38,8 +39,10 @@ jobs:
           mv build/app/outputs/flutter-apk/app-release.apk \
              build/app/outputs/flutter-apk/app-release-$VERSION.apk
 
-      - name: Install AWS CLI
-        run: brew install awscli
+      - name: Install AWS CLI and jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli jq
 
       - name: Upload APK to Cloudflare R2
         env:
