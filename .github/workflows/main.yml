@@ -43,28 +43,24 @@ jobs:
           mv build/app/outputs/flutter-apk/app-release.apk \
              build/app/outputs/flutter-apk/app-release-$VERSION.apk
 
-      - name: Decode Firebase credentials
-        run: echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" | base64 --decode > firebase.json
+      - name: Install AWS CLI
+        run: brew install awscli
 
-      - name: Install jq
-        run: brew install jq
-
-      # ✅ OFFICIAL GOOGLE STEP (this is the key)
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          service_account_key: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          export_default_credentials: true
-
-      - name: Upload APK to Google Cloud Storage
+      - name: Upload APK to Cloudflare R2
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
         run: |
-          PROJECT_ID=$(jq -r '.project_id' firebase.json)
+          set -e
+          aws configure set default.s3.signature_version s3v4
 
-          gsutil cp \
+          aws s3 cp \
             build/app/outputs/flutter-apk/*.apk \
-            gs://$PROJECT_ID.appspot.com/apks/
+            "s3://${{ secrets.R2_BUCKET_NAME }}/" \
+            --endpoint-url "https://${{ secrets.CF_ACCOUNT_ID }}.r2.cloudflarestorage.com"
 
-      - name: Upload APK artifact
+      - name: Upload APK artifact (backup)
         uses: actions/upload-artifact@v4
         with:
           name: flutter-apk
