@@ -1,3 +1,5 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
 name: Build & Release (Testing)
 
 on:
@@ -25,14 +27,7 @@ jobs:
       - name: Flutter pub get
         run: flutter pub get
 
-      - name: Bump versionCode
-        run: |
-          VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
-          NAME=${VERSION%%+*}
-          CODE=${VERSION##*+}
-          NEW_CODE=$((CODE+1))
-          sed -i '' "s/version: .*/version: $NAME+$NEW_CODE/" pubspec.yaml
-          echo "Updated version to $NAME+$NEW_CODE"
+      # ❌ No version increment — pubspec.yaml is source of truth
 
       - name: Build release APK
         run: flutter build apk --release
@@ -58,11 +53,8 @@ jobs:
           ls -lh build/app/outputs/flutter-apk
 
           APK_PATH=$(ls build/app/outputs/flutter-apk/*.apk)
-
           BUCKET="${{ secrets.R2_BUCKET_NAME }}"
           ACCOUNT="${{ secrets.CF_ACCOUNT_ID }}"
-
-          echo "Uploading to bucket: $BUCKET"
 
           aws configure set default.s3.signature_version s3v4
 
@@ -82,18 +74,13 @@ jobs:
           APK_FILE=$(ls build/app/outputs/flutter-apk/*.apk)
           APK_NAME=$(basename "$APK_FILE")
 
-          BUCKET="${{ secrets.R2_BUCKET_NAME }}"
-          ACCOUNT="${{ secrets.CF_ACCOUNT_ID }}"
-
-          APK_URL="https://${ACCOUNT}.r2.cloudflarestorage.com/${BUCKET}/${APK_NAME}"
-
-          echo "APK URL: $APK_URL"
+          echo "APK KEY: $APK_NAME"
           echo "Version: $VERSION"
 
           BODY=$(jq -n \
-            --arg apk_url "$APK_URL" \
             --arg version "$VERSION" \
-            '{apk_url: $apk_url, version: $version}')
+            --arg apkKey "$APK_NAME" \
+            '{version: $version, apkKey: $apkKey}')
 
           echo "Calling LOCAL backend (allowed to fail)"
           curl -X POST "$LOCAL_BACKEND_URL/api/app/add-new-version" \
