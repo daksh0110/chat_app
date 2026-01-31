@@ -49,16 +49,15 @@ jobs:
       - name: Install jq
         run: brew install jq
 
-      - name: Install Google Cloud SDK
-        run: |
-          curl -sSL https://sdk.cloud.google.com | bash
-          source "$HOME/google-cloud-sdk/path.bash.inc"
-          gcloud components install gsutil --quiet
+      # ✅ OFFICIAL GOOGLE STEP (this is the key)
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          service_account_key: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          export_default_credentials: true
 
       - name: Upload APK to Google Cloud Storage
         run: |
-          export GOOGLE_APPLICATION_CREDENTIALS=firebase.json
-
           PROJECT_ID=$(jq -r '.project_id' firebase.json)
 
           gsutil cp \
