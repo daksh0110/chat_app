@@ -59,8 +59,8 @@ jobs:
 
           APK_PATH=$(ls build/app/outputs/flutter-apk/*.apk)
 
-          BUCKET=$(echo "${{ secrets.R2_BUCKET_NAME }}" | tr -d '\n')
-          ACCOUNT=$(echo "${{ secrets.CF_ACCOUNT_ID }}" | tr -d '\n')
+          BUCKET="${{ secrets.R2_BUCKET_NAME }}"
+          ACCOUNT="${{ secrets.CF_ACCOUNT_ID }}"
 
           echo "Uploading to bucket: $BUCKET"
 
@@ -70,11 +70,12 @@ jobs:
             "$APK_PATH" \
             "s3://$BUCKET/" \
             --endpoint-url "https://$ACCOUNT.r2.cloudflarestorage.com"
-          - name: Notify backends of new APK
-          env:
+
+      - name: Notify backends of new APK
+        env:
           LOCAL_BACKEND_URL: ${{ secrets.LOCAL_BACKEND_URL }}
           PROD_BACKEND_URL: ${{ secrets.PROD_BACKEND_URL }}
-          run: |
+        run: |
           set -e
 
           VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
