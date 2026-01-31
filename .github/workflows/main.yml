@@ -70,3 +70,36 @@ jobs:
             "$APK_PATH" \
             "s3://$BUCKET/" \
             --endpoint-url "https://$ACCOUNT.r2.cloudflarestorage.com"
+          - name: Notify backends of new APK
+          env:
+          LOCAL_BACKEND_URL: ${{ secrets.LOCAL_BACKEND_URL }}
+          PROD_BACKEND_URL: ${{ secrets.PROD_BACKEND_URL }}
+          run: |
+          set -e
+
+          VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
+          APK_FILE=$(ls build/app/outputs/flutter-apk/*.apk)
+          APK_NAME=$(basename "$APK_FILE")
+
+          BUCKET="${{ secrets.R2_BUCKET_NAME }}"
+          ACCOUNT="${{ secrets.CF_ACCOUNT_ID }}"
+
+          APK_URL="https://${ACCOUNT}.r2.cloudflarestorage.com/${BUCKET}/${APK_NAME}"
+
+          echo "APK URL: $APK_URL"
+          echo "Version: $VERSION"
+
+          BODY=$(jq -n \
+            --arg apk_url "$APK_URL" \
+            --arg version "$VERSION" \
+            '{apk_url: $apk_url, version: $version}')
+
+          echo "Calling LOCAL backend (allowed to fail)"
+          curl -X POST "$LOCAL_BACKEND_URL/api/app/add-new-version" \
+            -H "Content-Type: application/json" \
+            -d "$BODY" || echo "⚠️ Local backend failed (expected sometimes)"
+
+          echo "Calling PROD backend (must succeed)"
+          curl -X POST "$PROD_BACKEND_URL/api/app/add-new-version" \
+            -H "Content-Type: application/json" \
+            -d "$BODY"
