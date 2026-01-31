@@ -59,11 +59,14 @@ jobs:
 
           APK_PATH=$(ls build/app/outputs/flutter-apk/*.apk)
 
-          echo "Uploading $APK_PATH"
+          BUCKET=$(echo "${{ secrets.R2_BUCKET_NAME }}" | tr -d '\n')
+          ACCOUNT=$(echo "${{ secrets.CF_ACCOUNT_ID }}" | tr -d '\n')
+
+          echo "Uploading to bucket: $BUCKET"
 
           aws configure set default.s3.signature_version s3v4
 
           aws s3 cp \
             "$APK_PATH" \
-            "s3://${{ secrets.R2_BUCKET_NAME }}/" \
-            --endpoint-url "https://${{ secrets.CF_ACCOUNT_ID }}.r2.cloudflarestorage.com"
+            "s3://$BUCKET/" \
+            --endpoint-url "https://$ACCOUNT.r2.cloudflarestorage.com"
