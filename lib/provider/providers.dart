@@ -1,14 +1,11 @@
 import 'package:chat_app/modal/authentication_data.dart';
-import 'package:chat_app/modal/chat_list_item.dart';
-import 'package:chat_app/modal/message_item_modal.dart';
 import 'package:chat_app/services/api_client.dart';
 import 'package:chat_app/services/secure_storage.dart';
-import 'package:chat_app/services/socket_client.dart';
 import 'package:chat_app/services/user_api_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
-enum AuthenticatedState { authenticated, unauthenticated }
+enum AuthenticatedState { started, authenticated, unauthenticated }
 
 final secureStorageProvider = Provider<SecureStorage>((ref) {
   return SecureStorage();
@@ -19,7 +16,7 @@ final userApiProvider = Provider<UserApiService>((ref) {
 });
 
 final authStateProvider = StateProvider<AuthenticatedState>((ref) {
-  return AuthenticatedState.unauthenticated;
+  return AuthenticatedState.started;
 });
 
 final verifySessionProvider = FutureProvider<AuthenticatedState>((ref) async {
@@ -30,7 +27,6 @@ final verifySessionProvider = FutureProvider<AuthenticatedState>((ref) async {
     final accessToken = await storage.getData(key: 'accessToken');
     final refreshToken = await storage.getData(key: 'refreshToken');
     final deviceId = await storage.getData(key: 'deviceId');
-
     if (accessToken == null || refreshToken == null || deviceId == null) {
       return AuthenticatedState.unauthenticated;
     }

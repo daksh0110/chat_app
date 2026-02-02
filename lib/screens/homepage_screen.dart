@@ -1,9 +1,4 @@
-import 'package:chat_app/modal/chat_list_item.dart';
-import 'package:chat_app/modal/message_item_modal.dart';
 import 'package:chat_app/provider/messages/chat_list_provider.dart';
-import 'package:chat_app/provider/providers.dart';
-import 'package:chat_app/provider/socket_providers.dart';
-import 'package:chat_app/services/socket_client.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/widgets/app_text.dart';
 import 'package:chat_app/widgets/homescreen/chat_list.dart';
@@ -23,7 +18,6 @@ class HomepageScreen extends ConsumerStatefulWidget {
 
 class _HomepageScreenState extends ConsumerState<HomepageScreen> {
   final PageController pageViewController = PageController();
-  late final SocketClient _socket;
   int selectedTab = 0;
 
   @override
@@ -34,7 +28,6 @@ class _HomepageScreenState extends ConsumerState<HomepageScreen> {
   @override
   void dispose() {
     pageViewController.dispose();
-    _socket.disconnect();
     super.dispose();
   }
 

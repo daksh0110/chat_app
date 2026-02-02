@@ -1,7 +1,4 @@
-import 'package:chat_app/modal/authentication_data.dart';
-import 'package:chat_app/services/api_client.dart';
 import 'package:chat_app/services/secure_storage.dart';
-import 'package:chat_app/services/user_api_service.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/widgets/app_text.dart';
 import 'package:flutter/material.dart';
@@ -21,10 +18,14 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void _goToHome() {
+    if (!mounted) return;
+
     Navigator.pushReplacementNamed(context, '/homepage');
   }
 
   void _goToOnboarding() {
+    if (!mounted) return;
+
     Navigator.pushReplacementNamed(context, '/onboarding');
   }
 
@@ -36,36 +37,11 @@ class _SplashScreenState extends State<SplashScreen> {
       final refreshToken = await storage.getData(key: "refreshToken");
       final deviceId = await storage.getData(key: "deviceId");
 
-      if (refreshToken == null || deviceId == null) {
+      if (accessToken == null || refreshToken == null || deviceId == null) {
         await storage.clearAll();
         _goToOnboarding();
         return;
       }
-
-      final userApi = UserApiService(dio: ApiClient.dio);
-
-      final response = await userApi.verifyUser(
-        AuthenticationData(
-          accessToken: accessToken ?? "",
-          refreshToken: refreshToken,
-          deviceId: deviceId,
-        ),
-      );
-      if (response.success != true) {
-        await storage.clearAll();
-        _goToOnboarding();
-        return;
-      }
-
-      final data = response.data;
-      if (data == null) {
-        await storage.clearAll();
-        _goToOnboarding();
-        return;
-      }
-
-      await storage.setData(key: "accessToken", name: data.accessToken);
-      await storage.setData(key: "refreshToken", name: data.refreshToken);
 
       _goToHome();
     } catch (e) {
