@@ -12,27 +12,38 @@ class ChatListNotifier extends Notifier<List<ChatListItem>> {
   }
 
   void addItem(ChatListItem item) {
-    final index = state.indexWhere((user) => user.id == item.id);
-    final List<ChatListItem> newList = [...state];
+    final index = state.indexWhere((c) => c.id == item.id);
 
-    if (index != -1) {
-      newList.removeAt(index);
+    if (index == -1) {
+      state = [item, ...state];
+      return;
     }
+    final existing = state[index];
+    final merged = existing.copyWith(
+      name: item.name.isNotEmpty ? item.name : existing.name,
+      message: item.message ?? existing.message,
+      profilePic: item.profilePic ?? existing.profilePic,
+      roomId: existing.roomId,
+      lastMessageAt: item.lastMessageAt ?? existing.lastMessageAt,
+      newMessageCount: item.newMessageCount,
+    );
 
-    newList.insert(0, item);
+    final List<ChatListItem> newList = [...state];
+    newList.removeAt(index);
+    newList.insert(0, merged);
+
     state = newList;
   }
 
   void setRoomId({required String roomId, required String userid}) {
     final index = state.indexWhere((user) => user.id == userid);
-
     if (index == -1) {
       addItem(ChatListItem(id: userid, name: "", roomId: roomId));
       return;
     }
 
     final List<ChatListItem> newList = [...state];
-    newList[index] = newList[index].assignRoomId(roomId);
+    newList[index] = newList[index].copyWith(roomId: roomId);
     state = newList;
   }
 
@@ -54,7 +65,6 @@ class ChatListNotifier extends Notifier<List<ChatListItem>> {
     final DateTime time = DateTime.now();
 
     final index = state.indexWhere((user) => user.id == userId);
-
     if (index == -1) {
       addItem(
         ChatListItem(
@@ -70,7 +80,6 @@ class ChatListNotifier extends Notifier<List<ChatListItem>> {
 
     final List<ChatListItem> newList = [...state];
     final current = newList[index];
-
     newList[index] = current.copyWith(
       message: lastMessage,
       lastMessageAt: time,

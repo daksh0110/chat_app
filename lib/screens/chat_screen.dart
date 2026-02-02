@@ -1,9 +1,7 @@
 import 'package:chat_app/modal/chat_list_item.dart';
 import 'package:chat_app/provider/messages/chat_list_provider.dart';
 import 'package:chat_app/provider/messages/messages_notifier.dart';
-import 'package:chat_app/provider/providers.dart';
 import 'package:chat_app/provider/socket_providers.dart';
-import 'package:chat_app/services/socket_client.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/widgets/app_text.dart';
 import 'package:chat_app/widgets/chat_screen/chat_input_bar.dart';
@@ -31,8 +29,6 @@ class ChatScreen extends ConsumerStatefulWidget {
 }
 
 class _ChatScreenState extends ConsumerState<ChatScreen> {
-  late final SocketClient _socket;
-
   @override
   void initState() {
     super.initState();
@@ -45,7 +41,6 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   @override
   void dispose() {
-    _socket.removeMessageListener();
     super.dispose();
   }
 

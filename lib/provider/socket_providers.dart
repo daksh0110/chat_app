@@ -21,7 +21,6 @@ class SocketNotifier extends Notifier<SocketClient?> {
 
   Future<void> connect(String token) async {
     if (_socket != null) return;
-
     final socket = SocketClient();
     await socket.createSocketConnection(token);
     _socket = socket;
@@ -44,7 +43,6 @@ class SocketNotifier extends Notifier<SocketClient?> {
 
     final chats = ref.read(chatListProvider);
     final index = chats.indexWhere((c) => c.id == receiver);
-
     final roomId = index != -1 && chats[index].roomId.isNotEmpty
         ? chats[index].roomId
         : null;

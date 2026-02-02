@@ -1,5 +1,6 @@
-import 'package:chat_app/provider/providers.dart';
-import 'package:chat_app/provider/socket_providers.dart';
+import 'package:chat_app/core/app_controller.dart';
+import 'package:chat_app/core/navigation/navigator_key.dart';
+import 'package:chat_app/provider/app_update_provider.dart';
 import 'package:chat_app/screens/email_screen.dart';
 import 'package:chat_app/screens/email_verification.dart';
 import 'package:chat_app/screens/homepage_screen.dart';
@@ -9,6 +10,7 @@ import 'package:chat_app/screens/search_user_screen.dart';
 import 'package:chat_app/screens/splash_screen.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/utils/slide_page_route.dart';
+import 'package:chat_app/widgets/splash_screen/version_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -24,24 +26,25 @@ class MyApp extends ConsumerWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    ref.listen<AuthenticatedState>(authStateProvider, (previous, next) async {
-      final socketNotifier = ref.read(socketStateProvider.notifier);
+    ref.watch(appControllerProvider);
+    ref.listen<UpdateStatus>(updateControllerProvider, (prev, next) {
+      if (next == UpdateStatus.required) {
+        final controller = ref.read(updateControllerProvider.notifier);
 
-      if (next == AuthenticatedState.authenticated) {
-        final token = await ref
-            .read(secureStorageProvider)
-            .getData(key: 'accessToken');
-
-        if (token != null) {
-          await socketNotifier.connect(token);
-        }
-      } else {
-        socketNotifier.disconnect();
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          showDialog(
+            context: navigatorKey.currentContext!,
+            barrierDismissible: false,
+            builder: (_) => VersionAlert(
+              apkUrl: controller.apkUrl!,
+              version: controller.version!,
+            ),
+          );
+        });
       }
     });
-    ref.watch(socketStateProvider);
-
     return MaterialApp(
+      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
 

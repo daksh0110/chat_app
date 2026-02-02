@@ -1,5 +1,4 @@
 import 'package:chat_app/modal/backend/socket_invited_to_room.dart';
-import 'package:chat_app/modal/backend/socket_joined_room.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -56,7 +55,8 @@ class SocketClient {
     onMessage,
   }) {
     socket?.on("receive_private_message", (data) {
-      final String from = data["receiver"];
+      print(data);
+      final String from = data["sender"];
       final String message = data["message"];
       final DateTime messageSentAt = DateTime.fromMillisecondsSinceEpoch(
         data["messageSentAt"] as int,
