@@ -99,4 +99,27 @@ class SocketClient {
       onRoomCreated(roomId, userId);
     });
   }
+
+  void watchUserStatus({required String userId}) {
+    print("ONBJECT");
+
+    if (socket == null || socket!.connected != true) {
+      return;
+    }
+    socket!.emit('watch_user_status', {'userId': userId});
+  }
+
+  void receiveUserStatus({required Function(String status) onReceivingStatus}) {
+    if (socket == null) return;
+
+    socket!.off("user_status_change");
+    socket?.on("user_status_change", (data) {
+      final status = data["status"] as String;
+      onReceivingStatus(status);
+    });
+  }
+
+  void stopReceivingUserStatus() {
+    socket?.off("user_status_change");
+  }
 }

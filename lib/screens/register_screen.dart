@@ -1,5 +1,6 @@
 import 'package:chat_app/data/phraseData.dart';
 import 'package:chat_app/modal/register_data.dart';
+import 'package:chat_app/provider/providers.dart';
 import 'package:chat_app/services/api_client.dart';
 import 'package:chat_app/services/authentication_api_servcie.dart';
 import 'package:chat_app/services/cloudinary_api_servcie.dart';
@@ -12,17 +13,18 @@ import 'package:chat_app/widgets/primary_input.dart';
 import 'package:chat_app/widgets/register_screen/Upload_Image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
-class RegisterScreen extends StatefulWidget {
+class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key, required this.email});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
   final String email;
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final TextEditingController nickNameController = TextEditingController();
   final authApi = AuthenticationApiServcie(dio: ApiClient.dio);
   bool loading = false;
@@ -86,6 +88,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             name: data.refreshToken ?? "",
           );
           secureStorage.setData(key: "deviceId", name: data.deviceId ?? "");
+          ref.read(authStateProvider.notifier).state =
+              AuthenticatedState.authenticated;
           Navigator.pushNamedAndRemoveUntil(
             context,
             "/homepage",

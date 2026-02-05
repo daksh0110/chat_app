@@ -106,6 +106,26 @@ class SocketNotifier extends Notifier<SocketClient?> {
     );
   }
 
+  void watchUserStatus(String userId) {
+    if (_socket == null) {
+      print("❌ watchUserStatus called but socket is null");
+      return;
+    }
+    _socket?.watchUserStatus(userId: userId);
+  }
+
+  void listenUserStatus({required void Function(String status) onStatus}) {
+    _socket?.receiveUserStatus(
+      onReceivingStatus: (status) {
+        onStatus(status);
+      },
+    );
+  }
+
+  void stopListeningUserStatus() {
+    _socket?.stopReceivingUserStatus();
+  }
+
   void disconnect() {
     _disposeSocket();
     state = null;

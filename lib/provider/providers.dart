@@ -40,6 +40,11 @@ final verifySessionProvider = FutureProvider<AuthenticatedState>((ref) async {
     );
 
     if (response.success) {
+      final newAccessToken = response.data?.accessToken;
+
+      if (newAccessToken != null) {
+        await storage.setData(key: 'accessToken', name: newAccessToken);
+      }
       return AuthenticatedState.authenticated;
     }
 
