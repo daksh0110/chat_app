@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chat_app/provider/providers.dart';
 import 'package:chat_app/services/api_client.dart';
 import 'package:chat_app/services/authentication_api_servcie.dart';
 import 'package:chat_app/services/secure_storage.dart';
@@ -8,17 +9,20 @@ import 'package:chat_app/widgets/app_text.dart';
 import 'package:chat_app/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class EmailVerificationScreen extends StatefulWidget {
+class EmailVerificationScreen extends ConsumerStatefulWidget {
   const EmailVerificationScreen({super.key, required this.email});
+
   final String email;
 
   @override
-  State<EmailVerificationScreen> createState() =>
+  ConsumerState<EmailVerificationScreen> createState() =>
       _EmailVerificationScreenState();
 }
 
-class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
+class _EmailVerificationScreenState
+    extends ConsumerState<EmailVerificationScreen> {
   final TextEditingController _otpController = TextEditingController();
   final authApi = AuthenticationApiServcie(dio: ApiClient.dio);
   final secureStorage = SecureStorage();
@@ -27,12 +31,14 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   Timer? _timer;
   int _remainingSeconds = 30;
   bool loading = false;
+
   @override
   void dispose() {
     _otpController.dispose();
     super.dispose();
   }
 
+  @override
   void initState() {
     super.initState();
     canResend = false;
@@ -118,6 +124,8 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
           key: 'refreshToken',
           name: data.refreshToken ?? '',
         );
+        ref.read(authStateProvider.notifier).state =
+            AuthenticatedState.authenticated;
         Navigator.pushNamedAndRemoveUntil(
           context,
           "/homepage",

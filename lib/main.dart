@@ -28,7 +28,7 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(appControllerProvider);
     ref.listen<UpdateStatus>(updateControllerProvider, (prev, next) {
-      if (next == UpdateStatus.required) {
+      if (next == UpdateStatus.required && dotenv.env["BUILD"] != "LOCAL") {
         final controller = ref.read(updateControllerProvider.notifier);
 
         WidgetsBinding.instance.addPostFrameCallback((_) {

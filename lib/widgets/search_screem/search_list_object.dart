@@ -18,7 +18,6 @@ class SearchListObject extends StatelessWidget {
           MaterialPageRoute<void>(
             builder: (context) => ChatScreen(
               avatar: item.userMainImageUrl ?? "",
-              isTyping: false,
               userName: item.name,
               userId: item.id,
             ),

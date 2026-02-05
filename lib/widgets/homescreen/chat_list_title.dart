@@ -18,7 +18,6 @@ class ChatListTile extends StatelessWidget {
         Navigator.of(context).push(
           MaterialPageRoute<void>(
             builder: (context) => ChatScreen(
-              isTyping: false,
               userName: item.name,
               avatar: item.profilePic ?? "",
               userId: item.id,

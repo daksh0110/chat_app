@@ -2,6 +2,7 @@ import 'package:chat_app/modal/chat_list_item.dart';
 import 'package:chat_app/provider/messages/chat_list_provider.dart';
 import 'package:chat_app/provider/messages/messages_notifier.dart';
 import 'package:chat_app/provider/socket_providers.dart';
+import 'package:chat_app/services/socket_client.dart';
 import 'package:chat_app/theme/app_colors.dart';
 import 'package:chat_app/widgets/app_text.dart';
 import 'package:chat_app/widgets/chat_screen/chat_input_bar.dart';
@@ -9,17 +10,16 @@ import 'package:chat_app/widgets/chat_screen/messages_list.dart';
 import 'package:chat_app/widgets/circle_bubble.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:socket_io_client/socket_io_client.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
   final String userName;
-  final bool isTyping;
   final String avatar;
   final String userId;
 
   const ChatScreen({
     super.key,
     this.userName = 'John Doe',
-    this.isTyping = true,
     this.avatar = "",
     required this.userId,
   });
@@ -29,18 +29,33 @@ class ChatScreen extends ConsumerStatefulWidget {
 }
 
 class _ChatScreenState extends ConsumerState<ChatScreen> {
+  String status = "";
+  late SocketClient socket;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(chatListProvider.notifier).resetUnreadCount(widget.userId);
+      final socketNotifier = ref.read(socketStateProvider.notifier);
 
+      ref.read(chatListProvider.notifier).resetUnreadCount(widget.userId);
       ref.read(messagesProvider.notifier).markMessagesAsRead(widget.userId);
+      socketNotifier.watchUserStatus(widget.userId);
+      socketNotifier.listenUserStatus(
+        onStatus: (newStatus) {
+          setState(() {
+            print("reached here");
+            status = newStatus;
+          });
+        },
+      );
     });
   }
 
   @override
   void dispose() {
+    ref.read(socketStateProvider.notifier).stopListeningUserStatus();
+
     super.dispose();
   }
 
@@ -109,7 +124,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 ),
                 const SizedBox(height: 2),
                 AppText(
-                  widget.isTyping ? 'typing...' : 'online',
+                  status,
                   color: AppColors.placeholderTextColor,
                   fontSize: 14,
                 ),
