@@ -46,7 +46,7 @@ class ChatListItem {
     );
   }
 
-  ChatListItem assignRoomId(String RoomId) {
+  ChatListItem assignRoomId(String roomId) {
     return ChatListItem(
       name: name,
       id: id,
@@ -54,7 +54,7 @@ class ChatListItem {
       message: message,
       newMessageCount: 0,
       profilePic: profilePic,
-      roomId: RoomId,
+      roomId: roomId,
     );
   }
 
@@ -76,4 +76,27 @@ class ChatListItem {
       roomId: roomId ?? this.roomId,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "name": name,
+      "message": message,
+      "profilePic": profilePic,
+      "newMessageCount": newMessageCount,
+      "lastMessageAt": lastMessageAt?.toIso8601String(),
+      "roomId": roomId,
+      "id": id,
+    };
+  }
+
+  ChatListItem.fromJson(Map<String, dynamic> json)
+    : name = json["name"] as String,
+      message = json["message"] as String? ?? "",
+      profilePic = json["profilePic"] as String? ?? "",
+      newMessageCount = json["newMessageCount"] as int? ?? 0,
+      lastMessageAt = json["lastMessageAt"] != null
+          ? DateTime.parse(json["lastMessageAt"])
+          : null,
+      roomId = json["roomId"] as String? ?? "",
+      id = json["id"] as String;
 }

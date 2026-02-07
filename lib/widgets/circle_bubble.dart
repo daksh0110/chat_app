@@ -16,7 +16,10 @@ class CircleBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Image? resolvedImage =
-        image ?? (imageProvider != null ? Image(image: imageProvider!) : null);
+        image ??
+        (imageProvider != null
+            ? Image(image: imageProvider!, fit: BoxFit.cover)
+            : null);
 
     return InkWell(
       child: Container(
@@ -26,6 +29,7 @@ class CircleBubble extends StatelessWidget {
           shape: BoxShape.circle,
         ),
         clipBehavior: Clip.hardEdge,
+
         child: resolvedImage,
       ),
     );
