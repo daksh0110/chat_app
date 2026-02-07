@@ -1,3 +1,5 @@
+import 'package:chat_app/db/chat_list_item_dao.dart';
+import 'package:chat_app/db/message_dao.dart';
 import 'package:chat_app/modal/chat_list_item.dart';
 
 import 'package:chat_app/modal/message_item_modal.dart';
@@ -12,6 +14,8 @@ final socketStateProvider = NotifierProvider<SocketNotifier, SocketClient?>(
 
 class SocketNotifier extends Notifier<SocketClient?> {
   SocketClient? _socket;
+  final ChatListItemDao _chatListDao = ChatListItemDao();
+  final MessageDao _messageDao = MessageDao();
 
   @override
   SocketClient? build() {
@@ -30,15 +34,16 @@ class SocketNotifier extends Notifier<SocketClient?> {
     _roomCreated();
   }
 
-  void sendMessage({required String receiver, required String message}) {
+  void sendMessage({required String receiver, required String message}) async {
     final msg = MessageItemModal(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       message: message,
       messageAt: DateTime.now(),
       messageBy: MessageDirection.sent,
       status: MessageStatus.sent,
+      userId: receiver,
     );
-
+    await _messageDao.insert(msg);
     ref.read(messagesProvider.notifier).addMessage(receiver, msg);
 
     final chats = ref.read(chatListProvider);
@@ -51,7 +56,7 @@ class SocketNotifier extends Notifier<SocketClient?> {
 
   void _invitedToRoom() {
     _socket?.invitedToRoom(
-      onInvitation: (data) {
+      onInvitation: (data) async {
         final user = ChatListItem(
           name: data.name,
           id: data.from,
@@ -61,6 +66,7 @@ class SocketNotifier extends Notifier<SocketClient?> {
           roomId: data.roomId,
           profilePic: data.profilePic ?? "",
         );
+        await _chatListDao.insert(user);
         ref.read(chatListProvider.notifier).addItem(user);
         final msg = MessageItemModal(
           id: data.messageSentAt.microsecondsSinceEpoch.toString(),
@@ -68,7 +74,9 @@ class SocketNotifier extends Notifier<SocketClient?> {
           messageBy: MessageDirection.received,
           messageAt: data.messageSentAt,
           status: MessageStatus.delivered,
+          userId: data.from,
         );
+        await _messageDao.insert(msg);
         ref.read(messagesProvider.notifier).addMessage(data.from, msg);
       },
     );
@@ -76,14 +84,16 @@ class SocketNotifier extends Notifier<SocketClient?> {
 
   void _registerListeners() {
     _socket?.recieveMessage(
-      onMessage: (from, message, sentAt) {
+      onMessage: (from, message, sentAt) async {
         final msg = MessageItemModal(
           id: sentAt.millisecondsSinceEpoch.toString(),
           message: message,
           messageAt: sentAt,
           messageBy: MessageDirection.received,
           status: MessageStatus.delivered,
+          userId: from,
         );
+        await _messageDao.insert(msg);
         ref.read(messagesProvider.notifier).addMessage(from, msg);
         ref
             .read(chatListProvider.notifier)
@@ -98,10 +108,11 @@ class SocketNotifier extends Notifier<SocketClient?> {
 
   void _roomCreated() {
     _socket?.roomCreated(
-      onRoomCreated: (roomId, userId) {
+      onRoomCreated: (roomId, userId) async {
         ref
             .read(chatListProvider.notifier)
             .setRoomId(roomId: roomId, userid: userId);
+        await _chatListDao.setRoomId(roomId, userId);
       },
     );
   }

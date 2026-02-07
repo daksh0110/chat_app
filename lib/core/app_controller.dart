@@ -1,5 +1,7 @@
 import 'package:chat_app/core/navigation/navigator_key.dart';
+import 'package:chat_app/db/chat_list_item_dao.dart';
 import 'package:chat_app/provider/app_update_provider.dart';
+import 'package:chat_app/provider/messages/chat_list_provider.dart';
 import 'package:chat_app/provider/providers.dart';
 import 'package:chat_app/provider/socket_providers.dart';
 import 'package:chat_app/services/Api_calls/app_api_service.dart';
@@ -54,6 +56,9 @@ final appControllerProvider = Provider<void>((ref) {
           .getData(key: 'accessToken');
 
       if (token != null) {
+        final ChatListItemDao _chatListDao = ChatListItemDao();
+        final chats = await _chatListDao.getAll();
+        ref.read(chatListProvider.notifier).addAll(chats);
         await socket.connect(token);
         navigatorKey.currentState?.pushNamedAndRemoveUntil(
           '/homepage',

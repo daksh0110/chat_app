@@ -90,4 +90,8 @@ class ChatListNotifier extends Notifier<List<ChatListItem>> {
 
     state = newList;
   }
+
+  void addAll(List<ChatListItem> items) {
+    state = [...state, ...items];
+  }
 }

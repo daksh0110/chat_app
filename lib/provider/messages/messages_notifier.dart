@@ -19,6 +19,13 @@ class MessagesNotifier extends Notifier<Map<String, List<MessageItemModal>>> {
       userId: [...current, message],
     };
   }
+  
+  void addMessages(String userId, List<MessageItemModal> messages) {
+    state = {
+      ...state,
+      userId: messages,
+    };
+  }
 
   void markMessagesAsRead(String userId) {
     final current = state[userId] ?? [];

@@ -1,4 +1,7 @@
+import 'package:chat_app/db/chat_list_item_dao.dart';
+import 'package:chat_app/db/message_dao.dart';
 import 'package:chat_app/modal/chat_list_item.dart';
+import 'package:chat_app/modal/message_item_modal.dart';
 import 'package:chat_app/provider/messages/chat_list_provider.dart';
 import 'package:chat_app/provider/messages/messages_notifier.dart';
 import 'package:chat_app/provider/socket_providers.dart';
@@ -35,18 +38,24 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final socketNotifier = ref.read(socketStateProvider.notifier);
-
+      final MessageDao messageDao = MessageDao();
+      final messages = await messageDao.getMessagesByUserId(widget.userId);
+      if (!mounted) return;
+      print(messages);
+      ref.read(messagesProvider.notifier).addMessages(widget.userId, messages);
       ref.read(chatListProvider.notifier).resetUnreadCount(widget.userId);
       ref.read(messagesProvider.notifier).markMessagesAsRead(widget.userId);
       socketNotifier.watchUserStatus(widget.userId);
       socketNotifier.listenUserStatus(
         onStatus: (newStatus) {
-          setState(() {
-            print("reached here");
-            status = newStatus;
-          });
+          if (mounted) {
+            setState(() {
+              print("reached here");
+              status = newStatus;
+            });
+          }
         },
       );
     });
@@ -63,16 +72,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     ref
         .read(socketStateProvider.notifier)
         .sendMessage(receiver: widget.userId, message: text);
-    ref
-        .read(chatListProvider.notifier)
-        .addItem(
-          ChatListItem(
-            name: widget.userName,
-            id: widget.userId,
-            message: "you: $text",
-            profilePic: widget.avatar,
-          ),
-        );
+    final ChatListItem user = ChatListItem(
+      name: widget.userName,
+      id: widget.userId,
+      message: "you: $text",
+      profilePic: widget.avatar,
+    );
+    ref.read(chatListProvider.notifier).addItem(user);
+    final ChatListItemDao _chatListDao = ChatListItemDao();
+    _chatListDao.insert(user);
 
     ref
         .read(chatListProvider.notifier)
